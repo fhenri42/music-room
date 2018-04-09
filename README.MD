@@ -8,7 +8,7 @@
 * ```brew install cocoapods```
 * ```brew install nodejs```
 * ```npm install -g yarn```
-* ```npm install -g expo```
+* ```npm install exp --global```
 
 # Start Server
 
