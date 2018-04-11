@@ -98,7 +98,7 @@ export default [
 
   {
     method: 'POST',
-    path: '/room/update/:playListId/:userId',
+    path: '/room/update/:roomId/:userId',
     handler: RoomController.updatePublic,
     validator: [isLogin],
   },
@@ -108,20 +108,20 @@ nIqUE LA DocC
 **/
   {
     method: 'POST',
-    path: '/room/updatePrivate/:playListId/:userId',
+    path: '/room/updatePrivate/:roomId/:userId',
     handler: RoomController.updatePrivate,
     validator: [isLogin],
   },
   {
     method: 'PUT',
-    path: '/room/update/:playListId/:userId/:newId/:songName',
+    path: '/room/update/:roomId/:userId/:newId/:songName',
     handler: RoomController.addMusicToList,
     validator: [isLogin],
   },
 
   {
     method: 'PUT',
-    path: '/room/delete/user/:playListId/:userId/:userIdToDelete',
+    path: '/room/delete/user/:roomId/:userId/:userIdToDelete',
     handler: RoomController.deleteUser,
     validator: [isLogin],
   },

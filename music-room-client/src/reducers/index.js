@@ -2,7 +2,7 @@ import { fromJS } from 'immutable'
 
 import { login, verifeUser } from './user/index.js'
 import { updateListOfplayList, setListOfPlaylist, updatePlaylist } from './playlist/index.js'
-import { updateListOfroom, setListOfRoom, updateRoom } from './room/index.js'
+import { updateListOfRoom, setListOfRoom, updateRoom } from './room/index.js'
 
 const intialStateUser = {
   firstName: '',

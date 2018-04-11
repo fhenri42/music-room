@@ -4,9 +4,9 @@ import User from '../models/user.model'
 import _ from 'lodash'
 import request from 'superagent'
 
-const createParams = '{name,description,type,users,songs}'
-const updateParamsPublic = '{songs,users,description,type}'
-const updateParamsPrivate = '{type,email}'
+const createParams = '{name,description,location,type,users,songs}'
+const updateParamsPublic = '{songs,users,description,location,type}'
+const updateParamsPrivate = '{type,email,location}'
 
 export default class RoomController {
 
@@ -19,6 +19,11 @@ export default class RoomController {
       if (u) { return res.status(400).send({ message: 'An room already exist with this name.' }) }
 
       const room = new Room({
+        location: {
+            active: 0,
+            distance: 0,
+            center: {lat: 0, long: 0}
+        },
         name: params.name,
         description: params.description,
         type: params.type,
@@ -56,22 +61,22 @@ export default class RoomController {
   // TODO A CHANGER DE OUF
   static getRoomAll (req, res) {
 
-    Room.find().then(playLists => {
+    Room.find().then(rooms => {
 
       const arrayToSend = []
 
-      playLists.forEach(room => { room.users.forEach(u => { if (u.id === req.params.userId && room.type === 'private') { arrayToSend.push(room) } }) })
-      playLists.forEach(room => { if (room.type === 'public') { arrayToSend.push(room) } })
-      playLists.forEach(p => {
-        p.songs = _.sortBy(p.songs, ['grade'])
+      rooms.forEach(room => { room.users.forEach(u => { if (u.id === req.params.userId && room.type === 'private') { arrayToSend.push(room) } }) })
+      rooms.forEach(room => { if (room.type === 'public') { arrayToSend.push(room) } })
+      rooms.forEach(p => {
+        p.songs = _.sortBy(p.songs, ['vote'], ['desc'])
 
       })
-      return res.json({ message: 'Your playLists', playLists: arrayToSend }) /* istanbul ignore next */
+      return res.json({ message: 'Your rooms', rooms: arrayToSend }) /* istanbul ignore next */
     }).catch(() => { return res.status(500).send({ message: 'Internal serveur error' }) })
   }
 
   static deleteUser (req, res) {
-    Room.findOne({ _id: req.params.playListId }).then(room => {
+    Room.findOne({ _id: req.params.roomId }).then(room => {
 
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
 
@@ -83,8 +88,8 @@ export default class RoomController {
       })
 
       room.users.splice(index, 1)
-      Room.findOneAndUpdate({ _id: req.params.playListId }, { $set: { users: room.users } }, { new: true }).then(room => {
-        room.songs = _.sortBy(room.songs, ['grade'])
+      Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: { users: room.users } }, { new: true }).then(room => {
+        room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
         return res.json({ message: 'Your room', room })
       }).catch(() => {
         return res.status(500).send({ message: 'Internal serveur error' })
@@ -95,7 +100,7 @@ export default class RoomController {
   static updatePrivate (req, res) {
     const params = filter(req.body, updateParamsPrivate)
 
-    Room.findOne({ _id: req.params.playListId }).then(room => {
+    Room.findOne({ _id: req.params.roomId }).then(room => {
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
       User.findOne({ email: params.email }).then(user => {
         if (!user) { return res.status(404).send({ message: 'No user found' }) }
@@ -120,8 +125,8 @@ export default class RoomController {
         if (params.type.toString() === 'read&&write') { tmpT = 'RW' }
         if (!doubleUser) { users.push({ id: user.id, role: tmpT, email: user.email, super: false }) } else { users[index] = { id: user.id, role: tmpT, email: user.email, super: false } }
 
-        Room.findOneAndUpdate({ _id: req.params.playListId }, { $set: { users } }, { new: true }).then(room => {
-          room.songs = _.sortBy(room.songs, ['grade'])
+        Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: { users } }, { new: true }).then(room => {
+          room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
 
           return res.json({ message: 'Your room', room })
         }).catch(() => {
@@ -134,7 +139,7 @@ export default class RoomController {
   static updatePublic (req, res) {
     const params = filter(req.body, updateParamsPublic)
 
-    Room.findOne({ _id: req.params.playListId }).then(room => {
+    Room.findOne({ _id: req.params.roomId }).then(room => {
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
 
       let test = false
@@ -144,9 +149,9 @@ export default class RoomController {
         }
       })
       if (!test) { return res.status(403).send({ message: 'You are not allowed to access this room' }) }
-
-      Room.findOneAndUpdate({ _id: req.params.playListId }, { $set: params }, { new: true }).then(room => {
-        room.songs = _.sortBy(room.songs, ['grade'])
+console.log('params ==>', params)
+      Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: params }, { new: true }).then(room => {
+        room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
 
         return res.json({ message: 'Your room', room })
       }).catch(() => {
@@ -157,7 +162,7 @@ export default class RoomController {
 
   static addMusicToList (req, res) {
 
-    Room.findOne({ _id: req.params.playListId }).then(room => {
+    Room.findOne({ _id: req.params.roomId }).then(room => {
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
       let test = false
       room.users.forEach(u => {
@@ -168,9 +173,9 @@ export default class RoomController {
       if (!test) { return res.status(403).send({ message: 'You are not allowed to access this room' }) }
 
       const songs = room.songs
-      songs.push({ id: req.params.newId, grade: songs.length - 1, name: req.params.songName })
-      Room.findOneAndUpdate({ _id: req.params.playListId }, { $set: { songs } }, { new: true }).then(room => {
-        room.songs = _.sortBy(room.songs, ['grade'])
+      songs.push({ id: req.params.newId, grade: songs.length - 1, name: req.params.songName, vote: 0 })
+      Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: { songs } }, { new: true }).then(room => {
+        room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
 
         return res.json({ message: 'Your room', room })
       }).catch(() => { return res.status(500).send({ message: 'Internal serveur error' }) })

@@ -91,15 +91,15 @@ const validate = values => {
   return errors
 }
 
-NewPlaylist = reduxForm({
+NewRoom = reduxForm({
   form: 'singupForm',
   validate,
-})(NewPlaylist)
+})(NewRoom)
 
 const mapStateToProps = state => {
   return {
     user: state.user.toJS(),
-    playlist: state.playlist.toJS(),
+    room: state.room.toJS(),
     notife: state.notife.toJS(),
   }
 }
@@ -108,4 +108,4 @@ const mapDispatchToProps = dispatch => {
   return { dispatch }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewPlaylist)
+export default connect(mapStateToProps, mapDispatchToProps)(NewRoom)
