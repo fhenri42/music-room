@@ -2,6 +2,8 @@ import { fromJS } from 'immutable'
 
 import { login, verifeUser } from './user/index.js'
 import { updateListOfplayList, setListOfPlaylist, updatePlaylist } from './playlist/index.js'
+import { updateListOfroom, setListOfRoom, updateRoom } from './room/index.js'
+
 const intialStateUser = {
   firstName: '',
   lastName: '',
@@ -21,6 +23,12 @@ const intialStatePlaylist = {
   playlists: [],
   nbr: 0,
 }
+
+const intialStateRoom = {
+  rooms: [],
+  nbr: 0,
+}
+
 const intialStateNotife = {
   message: '',
 }
@@ -52,6 +60,21 @@ export default class reducer {
       return updatePlaylist(state, action.data)
     case 'http/updatePlaylist':
       return updatePlaylist(state, action.data)
+    default:
+      return state
+    }
+  }
+
+  static room (state = fromJS(intialStateRoom), action) {
+    switch (action.type) {
+    case 'http/getAllroom':
+      return setListOfRoom(state, action.data)
+    case 'http/newRoom':
+      return updateListOfRoom(state, action.data)
+    case 'http/addSongRoom':
+      return updateRoom(state, action.data)
+    case 'http/updateRoom':
+      return updateRoom(state, action.data)
     default:
       return state
     }

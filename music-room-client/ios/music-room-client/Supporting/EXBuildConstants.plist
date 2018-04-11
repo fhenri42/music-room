@@ -14,6 +14,6 @@
 	<key>STANDALONE_CONTEXT_TYPE</key>
 	<string>user</string>
 	<key>developmentUrl</key>
-	<string>exp41808209d72a4b248cdc3c929ec6dfb0://10.11.7.8:19000</string>
+	<string>exp41808209d72a4b248cdc3c929ec6dfb0://rr-wqb.fhenri.music-room-client.exp.direct:80</string>
 </dict>
 </plist>

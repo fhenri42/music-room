@@ -41,7 +41,7 @@ class Home extends Component {
       }}>
 
         {mode === 0 && (
-          <MusicTrack />
+          <MusicTrack user={user} playlist={playlist} />
         )}
         {mode === 1 && (
           <Playlist playlist={playlist} user={user}/>
