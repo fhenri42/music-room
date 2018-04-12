@@ -1,5 +1,5 @@
 {
-  "name": "GringoxAPI",
+  "name": "MusicRoomApi",
   "version": "0.0.0",
   "main": "src/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "build": "babel src --out-dir dist",
     "doc": "apidoc -i src/ -o doc/"
   },
-  "author": "Gringox Team",
+  "author": "Ktorza Tom",
   "license": "MIT",
   "eslintConfig": {
     "extends": [

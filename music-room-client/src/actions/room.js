@@ -2,9 +2,9 @@ import { callApi } from '../utils/callApi.js'
 import { Actions } from 'react-native-router-flux'
 import { getRoomTracks } from '../utils/deezerService.js'
 
-export function getRomm (userId) {
+export function getRoom (user) {
   return dispatch => {
-    callApi(`room/all/${userId}/`, 'get').then(body => {
+    callApi(`room/all/${user.userId}/${user.lat}/${user.long}`, 'get').then(body => {
       return dispatch({
         type: 'http/getAllroom',
         data: body,
@@ -21,7 +21,7 @@ export function createRoom (data) {
 
   return dispatch => {
     callApi('room/create', 'post', data).then(body => {
-      console.log("BODY ROOM", body.room)
+      // console.log("BODY ROOM", body.room)
       return dispatch({
         type: 'http/newRoom',
         data: body,
@@ -40,7 +40,7 @@ export function addSongRoom (id, roomId, userId, songName) {
 
   return dispatch => {
     callApi(`room/update/${roomId}/${userId}/${id}/${songName}`, 'put').then(body => {
-      console.log("sons----->", id, roomId, userId, songName)
+      // console.log("sons----->", id, roomId, userId, songName)
       return dispatch({
         type: 'http/addSongRoom',
         data: { body, roomId },
@@ -55,12 +55,9 @@ export function addSongRoom (id, roomId, userId, songName) {
 }
 
 export function updateRoom (data, roomId, userId) {
-//peut etre ca ne marchera pas car l'userId est multiple ici peut etre faut - il changer la route
+// peut etre ca ne marchera pas car l'userId est multiple ici peut etre faut - il changer la route
   return dispatch => {
-    console.log('its here', data)
-    
     callApi(`room/update/${roomId}/${userId}`, 'post', data).then(body => {
-      console.log('its here 2', body.room.location)
       return dispatch({
         type: 'http/updateRoom',
         data: { body, roomId },

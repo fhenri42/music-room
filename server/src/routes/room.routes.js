@@ -48,7 +48,7 @@ export default [
 
   {
     method: 'GET',
-    path: '/room/all',
+    path: '/room/all/:userId/:lat/:long',
     handler: RoomController.getRoomAll,
     validator: [isLogin],
   },

@@ -8,6 +8,24 @@ const createParams = '{name,description,location,type,users,songs}'
 const updateParamsPublic = '{songs,users,description,location,type}'
 const updateParamsPrivate = '{type,email,location}'
 
+function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1);  // deg2rad below
+  var dLon = deg2rad(lon2-lon1); 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c; // Distance in km
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+
 export default class RoomController {
 
   static create (req, res) {
@@ -58,19 +76,18 @@ export default class RoomController {
     })
   }
 
-  // TODO A CHANGER DE OUF
   static getRoomAll (req, res) {
-
     Room.find().then(rooms => {
-
       const arrayToSend = []
-
-      rooms.forEach(room => { room.users.forEach(u => { if (u.id === req.params.userId && room.type === 'private') { arrayToSend.push(room) } }) })
-      rooms.forEach(room => { if (room.type === 'public') { arrayToSend.push(room) } })
-      rooms.forEach(p => {
-        p.songs = _.sortBy(p.songs, ['vote'], ['desc'])
-
-      })
+      rooms.forEach(room => { 
+        if (room.type === 'public' ||
+        (room.type === 'private' && req.params.long && req.params.lat && room.location.active === 1 && 
+        (getDistanceFromLatLonInKm(room.location.center.lat, room.location.center.long, req.params.lat, req.params.long) <=  room.location.distance))) {
+          arrayToSend.push(room) 
+        }else{
+          room.users.forEach(u => {if (u.id === req.params.userId && room.type === 'private') {arrayToSend.push(room) }})
+        }
+        })
       return res.json({ message: 'Your rooms', rooms: arrayToSend }) /* istanbul ignore next */
     }).catch(() => { return res.status(500).send({ message: 'Internal serveur error' }) })
   }
@@ -141,16 +158,7 @@ export default class RoomController {
 
     Room.findOne({ _id: req.params.roomId }).then(room => {
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
-
-      let test = false
-      room.users.forEach(u => {
-        if (u.id === req.params.userId && u.role === 'RW') {
-          test = true
-        }
-      })
-      if (!test) { return res.status(403).send({ message: 'You are not allowed to access this room' }) }
-console.log('params ==>', params)
-      Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: params }, { new: true }).then(room => {
+    Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: params }, { new: true }).then(room => {
         room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
 
         return res.json({ message: 'Your room', room })
@@ -164,14 +172,6 @@ console.log('params ==>', params)
 
     Room.findOne({ _id: req.params.roomId }).then(room => {
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
-      let test = false
-      room.users.forEach(u => {
-        if (u.id === req.params.userId && u.role === 'RW') {
-          test = true
-        }
-      })
-      if (!test) { return res.status(403).send({ message: 'You are not allowed to access this room' }) }
-
       const songs = room.songs
       songs.push({ id: req.params.newId, grade: songs.length - 1, name: req.params.songName, vote: 0 })
       Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: { songs } }, { new: true }).then(room => {

@@ -18,7 +18,7 @@ export function updateRoom (state, data) {
 
   if (index === -1) { return state }
   rooms[index] = data.body.room
-// console.log("vote-->", data.body.room.songs)
+  // console.log("vote-->", data.body.room.songs)
 
   return state.setIn(['rooms'], fromJS(rooms))
 

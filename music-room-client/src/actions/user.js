@@ -4,7 +4,7 @@ import { Actions } from 'react-native-router-flux'
 export function loginUser (event) {
   return dispatch => {
     callApi(`user/${event.email}/`, 'get', {}, event.password).then(body => {
-
+      console.log('BOdy =>', body)
       return dispatch({
         type: 'http/login',
         data: body,

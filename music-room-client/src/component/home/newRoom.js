@@ -74,7 +74,7 @@ class NewRoom extends Component {
         />
 
         <Button onPress={ handleSubmit(this.onSubmit) }>Create</Button>
-      {/*  <Button disabled={!disab} onPress={() => { Actions.importList() }}>Import Play list</Button>*/}
+        {/*  <Button disabled={!disab} onPress={() => { Actions.importList() }}>Import Play list</Button>*/}
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
 
       </View>

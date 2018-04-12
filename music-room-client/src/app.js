@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
-import { Provider } from 'react-redux'
 import { Router, Scene, Stack } from 'react-native-router-flux'
-import { connect } from 'react-redux'
-import BackgroundGeolocation from "react-native-background-geolocation";
+import { connect, Provider } from 'react-redux'
+// import BackgroundGeolocation from "react-native-background-geolocation";
 
 import { Toast } from 'react-native-ui-lib'
 import Home from './component/home/index'
@@ -19,24 +18,6 @@ import Room from './component/home/editroom'
 import NewRoom from './component/home/newRoom'
 
 class App extends Component {
-  componentDidMount() {
-    
-        BackgroundGeolocation.on('motionchange', (event) => {
-          console.log('motionchange', event);
-        });
-        BackgroundGeolocation.on('location', (location) => {
-          console.log('location', location);
-        });
-        BackgroundGeolocation.on('providerchange', (provider) => {
-          console.log('providerchange', provider);
-        });
-        BackgroundGeolocation.configure({debug: true, logLevel: 5}, (state) => {
-          if (!state.enabled) {
-            BackgroundGeolocation.start();
-          }
-        });
-      }
-      
   render () {
     return (
       <Router>
@@ -82,15 +63,15 @@ class App extends Component {
             hideNavBar={false}
             title='Import your play list'
           />
-           <Scene key='newRoom'
+          <Scene key='newRoom'
             component={NewRoom}
             hideNavBar={false}
             title='edit or create a room'
           />
-           <Scene key='editRoom'
+          <Scene key='editRoom'
             component={Room}
             hideNavBar={false}
-            title='Import your play list'
+            title='Edit the room'
           />
         </Stack>
       </Router>

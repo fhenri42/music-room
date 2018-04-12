@@ -70,7 +70,6 @@ class AddNewUser extends Component {
             </View>)
           })
         )}
-  
 
       </View>
     )

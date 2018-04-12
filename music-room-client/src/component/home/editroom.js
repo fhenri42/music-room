@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, WebView, Dimensions } from 'react-native'
+import { StyleSheet, ScrollView, WebView, Dimensions, Platform } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import { Card, Input, H4, Switcher, TabButton, Button } from 'nachos-ui'
 import { connect } from 'react-redux'
@@ -11,7 +11,7 @@ import AddUser from './addroomuser.js'
 import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
 import { playTrack, pause, play } from '../../utils/deezerService.js'
-
+import { Constants, Location, Permissions } from 'expo'
 
 class Room extends Component {
 
@@ -23,13 +23,18 @@ class Room extends Component {
     uri: '',
     isPlaying: false,
     currentSong: '',
+    errorMessage: null,
+    location: null,
   }
 
-
-  componentDidMount(props){
-    this.playTrackWrapper(0);
-    console.log("hey la famille ")
-}
+  componentDidMount (props) {
+    this.playTrackWrapper(0)
+    if (Platform.OS === 'android' && !Constants.isDevice) {
+      this.props.notife.message = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
+    } else {
+      // this._getLocationAsync();
+    }
+  }
 
 playTrackWrapper = (id) => {
   const { isPlaying } = this.state
@@ -84,60 +89,100 @@ playTrackWrapper = (id) => {
 
   }
 
-  changeLocationType = () =>{
+  changeLocationType = async () => {
     const { room, dispatch, user } = this.props
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
-  
-    if (room.rooms[index1].users.findIndex(u => u.id === user.id) > -1){
-      room.rooms[index1].location.active ^=1
-      if (room.rooms[index1].location.active == 1){
-        navigator.geolocation.getCurrentPosition((position)=>{
-            room.rooms[index1].location.center = {lat: position.latitude, long: position.longitude}
-            dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
-        }, {enableHighAccuracy: true})
-      }else{
+    const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
+
+    if (indexUser === 0) {
+      room.rooms[index1].location.active ^= 1
+      if (room.rooms[index1].location.active === 1) {
+        const { status } = await Permissions.askAsync(Permissions.LOCATION)
+        if (status !== 'granted') {
+          this.props.notife.message = 'Permission to access location was denied'
+        }
+        const position = await Location.getCurrentPositionAsync({})
+        room.rooms[index1].location.center = { lat: position.coords.latitude, long: position.coords.longitude }
+        dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
+      } else {
         dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
       }
+
+    } else {
+      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
     }
   }
 
-
-  distanceChange = (distance) =>{
+  distanceChange = (distance) => {
     const { room, dispatch, user } = this.props
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
-  
-    if (room.rooms[index1].users.findIndex(u => u.id === user.id) > -1){
+    const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
+
+    if (indexUser === 0) {
+
       room.rooms[index1].location.distance = distance
-        dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
+      dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
+    } else {
+      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
     }
   }
-
 
 changeType = (status) => {
   const { room, dispatch, user } = this.props
   const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
+  const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
 
-  if (room.rooms[index1].users.findIndex(u => u.id === user.id) > -1){
-    room.rooms[index1].type ^=1
-      dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
+  if (indexUser === 0) {
+
+    room.rooms[index1].type = room.rooms[index1].type === 'private' ? 'public' : 'private'
+    dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
+  } else {
+    this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
   }
 }
 
-distanceOfCenter = (vote, songId) => {
+getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+  const R = 6371 // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1) // deg2rad below
+  const dLon = deg2rad(lon2 - lon1)
+  const a
+    = (Math.sin(dLat / 2) * Math.sin(dLat / 2))
+    + ((Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)))
+    * (Math.sin(dLon / 2) * Math.sin(dLon / 2)))
+
+  const c = 2 * (Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
+  const d = R * c // Distance in km
+  return d
+}
+
+deg2rad = (deg) => {
+  return deg * (Math.PI / 180)
+}
+
+distanceOfCenter = async (vote, songId) => {
   const { room, dispatch, user } = this.props
   const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
   const center = room.rooms[index1].location.center
   const distance = room.rooms[index1].location.distance
+  const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
 
-  navigator.geolocation.getCurrentPosition((position)=>{
-    //mettre ca aussi pour changer la position center 
-    if ((Math.sqrt(Math.pow(position.longitude - center.long, 2) +  Math.pow(position.latitude - center.lat, 2)) / 1000) <=  distance){
+  if (indexUser === 0) {
+    const { status } = await Permissions.askAsync(Permissions.LOCATION)
+    if (status !== 'granted') {
+      this.props.notife.message = 'Permission to access location was denied'
+    }
+
+    const position = await Location.getCurrentPositionAsync({})
+
+    if (this.getDistanceFromLatLonInKm(center.lat, center.long, position.coords.latitude, position.coords.longitude) <= distance) {
       const songs = room.rooms[index1].songs
-      const index = songs.findIndex(e => e.id == songId)
-      songs[index].vote +=((vote > 0) ? -1 : 1)
+      const index = songs.findIndex(e => e.id === songId)
+      songs[index].vote += ((vote > 0) ? -1 : 1)
       dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
     }
-  }, {enableHighAccuracy: true})
+  } else {
+    this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
+  }
 }
   updateVote = (vote, songId) => {
 
@@ -145,17 +190,10 @@ distanceOfCenter = (vote, songId) => {
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
 
     const songs = room.rooms[index1].songs
-    const index = songs.findIndex(e => e.id == songId)
+    const index = songs.findIndex(e => e.id === songId)
 
-    this.distanceOfCenter() == 1
-    
-    
-    if ((room.rooms[index1].users.findIndex(u => u.id === user.id) > -1) || room.rooms[index1].type != 0){
-        songs[index].vote +=((vote > 0) ? -1 : 1)
-        dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
-    }else{
-      this.distanceOfCenter()
-    }
+    songs[index].vote += ((vote > 0) ? -1 : 1)
+    dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
   }
 
   render () {
@@ -168,7 +206,7 @@ distanceOfCenter = (vote, songId) => {
     const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
     return (
       <View style={{ flex: 1 }}>
-        {room.rooms[index].users[indexUser].role === 'RW' && (
+        {(
           <Switcher
             onChange={valueOne => { this.setState({ typeOf: valueOne }) }}
             defaultSelected={typeOf}
@@ -184,7 +222,7 @@ distanceOfCenter = (vote, songId) => {
                 room.rooms[index].songs.map((s, key) => {
                   return (
                     <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                      {room.rooms[index].users[indexUser].role === 'RW' && (
+                      {(
                         <Icon
                           raised
                           name='keyboard-arrow-up'
@@ -193,7 +231,7 @@ distanceOfCenter = (vote, songId) => {
                           size={15}
                           onPress={() => { if (key !== 0) { this.updateVote(1, s.id) } }} />
                       )}
-                      {room.rooms[index].users[indexUser].role === 'RW' && (
+                      {(
                         <Icon
                           raised
                           name='keyboard-arrow-down'
