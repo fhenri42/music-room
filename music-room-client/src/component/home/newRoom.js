@@ -54,6 +54,7 @@ class NewRoom extends Component {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
+          backgroundColor: '#1e1438',
         }}>
         <Text >New track</Text>
         <Field

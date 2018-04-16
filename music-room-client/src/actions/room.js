@@ -21,12 +21,12 @@ export function createRoom (data) {
 
   return dispatch => {
     callApi('room/create', 'post', data).then(body => {
-      // console.log("BODY ROOM", body.room)
+      Actions.home()
       return dispatch({
         type: 'http/newRoom',
         data: body,
       })
-      Actions.home()
+
     }).catch(e => {
       return dispatch({
         type: 'client/addNotife',

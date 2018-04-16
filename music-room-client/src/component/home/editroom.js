@@ -25,9 +25,15 @@ class Room extends Component {
     currentSong: '',
     errorMessage: null,
     location: null,
+    listOfColor: [],
   }
 
   componentDidMount (props) {
+    var listOfColor = []
+
+    for (var i =0;i<1000;i++)
+      listOfColor.push(`rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`)
+    this.setState({ listOfColor })
     this.playTrackWrapper(0)
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.props.notife.message = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
@@ -38,6 +44,7 @@ class Room extends Component {
 
 playTrackWrapper = (id) => {
   const { isPlaying } = this.state
+  // rerender
   if (isPlaying) { playTrack(id).then((e) => { playTrack(id).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }
 }
   callDezzerapi = (value) => {
@@ -205,7 +212,7 @@ distanceOfCenter = async (vote, songId) => {
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
     const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: '#1e1438' }}>
         {(
           <Switcher
             onChange={valueOne => { this.setState({ typeOf: valueOne }) }}
@@ -220,8 +227,9 @@ distanceOfCenter = async (vote, songId) => {
             <ScrollView style={{ height: '60%' }}>
               { !!room && !!room.rooms && room.rooms[index].songs !== 0 && (
                 room.rooms[index].songs.map((s, key) => {
+                  const color = this.state.listOfColor[key % 1000]
                   return (
-                    <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                    <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: color }}>
                       {(
                         <Icon
                           raised
@@ -241,7 +249,7 @@ distanceOfCenter = async (vote, songId) => {
                           onPress={() => { if (key < room.rooms[index].songs.length - 1) { this.updateVote(-1, s.id) } }} />
                       )}
                       <H4 >Vote {-s.vote}</H4>
-                      <Button kind='squared' iconName='md-musical-notes' onPress={() => { this.playTrackWrapper(s.id) }}>{s.name}</Button>
+                      <Button style={{ backgroundColor: color }} kind='squared' iconName='md-musical-notes' onPress={() => { this.playTrackWrapper(s.id) }}>{s.name}</Button>
                     </View>)
                 })
               )}
@@ -274,7 +282,7 @@ distanceOfCenter = async (vote, songId) => {
                         image={e.album.cover_big}
                         style={cardStyle}
                       />
-                      <Button onPress={() => { this.props.dispatch(addSongRoom(e.id, this.props.roomId, this.props.userId, e.title)) }}>{'Add Song'}</Button>
+                      <Button style={{ backgroundColor: this.state.listOfColor[key % 1000] }} onPress={() => { this.props.dispatch(addSongRoom(e.id, this.props.roomId, this.props.userId, e.title)) }}>{'Add Song'}</Button>
                     </View>
                   )
                 })
