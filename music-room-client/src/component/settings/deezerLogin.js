@@ -16,7 +16,7 @@ export default class DeezerLogin extends React.Component {
   render () {
     return (
       <View style={styles.container}>
-        <Button kind='squared' onPress={() => { connectDeezer().then(res => { console.log(res) }) }}>{'Deezer'}</Button>
+        <Button kind='squared' onPress={() => { connectDeezer().then() }}>{'Deezer'}</Button>
         <Button kind='squared' onPress={() => {
           Expo.SecureStore.deleteItemAsync('token', {}).then(() => {
             Actions.login()

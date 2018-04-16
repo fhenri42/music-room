@@ -157,6 +157,7 @@ export default class UserController {
 
     User.findOneAndUpdate({ email, isEmailVerifiedToken: code },
       {
+        isActive: true,
         isEmailVerified: true,
         isEmailVerifiedToken: null,
       }, { new: true })

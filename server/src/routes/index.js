@@ -1,10 +1,12 @@
 import express from 'express'
 import userRoutes from './user.routes'
 import playlistRoute from './playlist.routes'
+import roomRoute from './room.routes'
 
 export const routes = [
   ...userRoutes,
   ...playlistRoute,
+  ...roomRoute,
 ]
 
 export const createRouter = app => {

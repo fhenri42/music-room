@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
-import { Provider } from 'react-redux'
 import { Router, Scene, Stack } from 'react-native-router-flux'
-import { connect } from 'react-redux'
+import { connect, Provider } from 'react-redux'
+// import BackgroundGeolocation from "react-native-background-geolocation";
 
 import { Toast } from 'react-native-ui-lib'
 import Home from './component/home/index'
@@ -14,6 +14,8 @@ import Code from './component/singup/code'
 import EditPlaylist from './component/home/editplaylist.js'
 import ResetPass from './component/login/resetPass'
 import ImportList from './component/home/importPlaylist.js'
+import Room from './component/home/editroom'
+import NewRoom from './component/home/newRoom'
 
 class App extends Component {
   render () {
@@ -60,6 +62,16 @@ class App extends Component {
             component={ImportList}
             hideNavBar={false}
             title='Import your play list'
+          />
+          <Scene key='newRoom'
+            component={NewRoom}
+            hideNavBar={false}
+            title='edit or create a room'
+          />
+          <Scene key='editRoom'
+            component={Room}
+            hideNavBar={false}
+            title='Edit the room'
           />
         </Stack>
       </Router>

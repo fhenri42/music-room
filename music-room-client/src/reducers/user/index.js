@@ -20,6 +20,7 @@ export function login (state, data) {
 export function verifeUser (state, token) {
 
   const user = jwtDecode(token)
+  Expo.SecureStore.setItemAsync('token', token, {})
 
   return state.setIn(['email'], fromJS(user.email))
     .setIn(['isAuthenticated'], fromJS(true))

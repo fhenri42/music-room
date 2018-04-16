@@ -33,15 +33,15 @@ class Home extends Component {
     const { handleSubmit, user, playlist } = this.props
     const { mode } = this.state
     return (
+
       <View style={{
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-
         {mode === 0 && (
-          <MusicTrack />
+          <MusicTrack user={user} playlist={playlist} />
         )}
         {mode === 1 && (
           <Playlist playlist={playlist} user={user}/>
@@ -52,8 +52,8 @@ class Home extends Component {
         )}
         <Menu playListMode={this.playListMode} settingsMode={this.settingsMode} serviceMode={this.serviceMode} />
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
-
       </View>
+
     )
   }
 }

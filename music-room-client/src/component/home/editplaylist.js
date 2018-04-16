@@ -12,7 +12,6 @@ import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
 import { playTrack, pause, play } from '../../utils/deezerService.js'
 
-
 class Playlist extends Component {
 
   state = {
@@ -84,7 +83,7 @@ playTrackWrapper = (id) => {
     const index1 = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
 
     const songs = playlist.playlists[index1].songs
-    const index = songs.findIndex(e => e.id == songId)
+    const index = songs.findIndex(e => e.id === songId)
 
     if (grade > 0) {
 
