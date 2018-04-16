@@ -11,7 +11,7 @@ import AddUser from './addroomuser.js'
 import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
 import { playTrack, pause, play } from '../../utils/deezerService.js'
-import { Constants, Location, Permissions } from 'expo'
+import { Constants, Location, Permissions, che } from 'expo'
 
 class Room extends Component {
 
@@ -28,13 +28,16 @@ class Room extends Component {
     listOfColor: [],
   }
 
-  componentDidMount (props) {
+  componentDidMount () {
     var listOfColor = []
+    const { room } = this.props
+
+    const index = room.rooms.findIndex(e => e._id === this.props.roomId)
 
     for (var i =0;i<1000;i++)
       listOfColor.push(`rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`)
     this.setState({ listOfColor })
-    this.playTrackWrapper(0)
+    this.playTrackWrapper(room.rooms[index].songs[0].id)
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.props.notife.message = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
     } else {
@@ -254,7 +257,7 @@ distanceOfCenter = async (vote, songId) => {
                 })
               )}
             </ScrollView >
-            <Player distanceChange={this.distanceChange} distance={room.rooms[index].location.distance} active={room.rooms[index].location.active} changeLocationType={this.changeLocationType} type={room.rooms[index].type} changeType={this.changeType} previousSong={this.previousSong} nextSong={this.nextSong} playSong={() => { this.pausePlay() }} />
+            <Player distanceChange={this.distanceChange} distance={room.rooms[index].location.distance} isPlaying={this.state.isPlaying}  active={room.rooms[index].location.active} changeLocationType={this.changeLocationType} type={room.rooms[index].type} changeType={this.changeType} previousSong={this.previousSong} nextSong={this.nextSong} playSong={() => { this.pausePlay() }} />
           </View>
         )}
 

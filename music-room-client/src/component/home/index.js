@@ -10,6 +10,8 @@ import { toJS } from 'immutable'
 import Settings from '../settings/index.js'
 import Toaster from '../toaster/index.js'
 import MusicTrack from './musicTrack.js'
+import { checkSession } from '../../utils/deezerService.js'
+
 
 class Home extends Component {
 
@@ -20,10 +22,19 @@ class Home extends Component {
         data: token,
       })
     })
+
   }
   state = {
     mode: this.props.mode || 0,
+    disab: false,
   }
+
+
+  componentWillReceiveProps (nextProps) { checkSession(((e) => {
+    if(e === false) {
+      this.setState({mode: 2})
+    }
+    this.setState({disab: e}) })) }
 
   serviceMode = () => { this.setState({ mode: 0 }) }
   playListMode = () => { this.setState({ mode: 1 }); this.props.dispatch(getPlayList(this.props.user.id)) }
@@ -31,7 +42,7 @@ class Home extends Component {
   render () {
 
     const { handleSubmit, user, playlist } = this.props
-    const { mode } = this.state
+    const { mode, disab } = this.state
     return (
 
       <View style={{
@@ -40,10 +51,10 @@ class Home extends Component {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-        {mode === 0 && (
+        {mode === 0 && disab &&  (
           <MusicTrack user={user} playlist={playlist} />
         )}
-        {mode === 1 && (
+        {mode === 1 && disab && (
           <Playlist playlist={playlist} user={user}/>
         )}
         {mode === 2 && (

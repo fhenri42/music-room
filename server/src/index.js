@@ -4,7 +4,6 @@ import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
 import event from './events/index.js'
 import config from '../config.js'
-import Promise from 'bluebird'
 
 const app = express()
 const server = require('http').createServer(app)

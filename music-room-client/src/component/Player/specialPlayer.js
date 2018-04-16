@@ -13,7 +13,7 @@ class Player extends Component {
 
   render () {
 
-    const { playSong, previousSong, nextSong, changeType, changeLocationType, distanceChange, distance, active } = this.props
+    const { playSong, previousSong, nextSong, changeType, changeLocationType, distanceChange, distance, active, isPlaying } = this.props
 
     return (
       <View>
@@ -25,12 +25,12 @@ class Player extends Component {
             color='#f50'
             onPress={previousSong} />
 
-          <Icon
-            raised
-            name='play-arrow'
-            type='play-arrow'
-            color='#f50'
-            onPress={playSong} />
+            <Icon
+              raised
+              name={isPlaying === true ? 'play-arrow': 'pause'}
+              type={isPlaying === true ? 'play-arrow': 'pause'}
+              color='#f50'
+              onPress={playSong} />
           <Icon
             raised
             name='skip-next'

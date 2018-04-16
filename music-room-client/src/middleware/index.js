@@ -41,6 +41,7 @@ const simpleMiddleWare = socket => ({ dispatch, getState }) => {
       }
 
       if (Actions.currentScene === 'home' && !token) { return Actions.login() }
+      
       return next(action)
     })
   }

@@ -20,7 +20,7 @@ class MusicTrack extends Component {
         <Button style={{ marginTop: '25%', width: '100%', backgroundColor: '#23242d' }} onPress={() => {
           Actions.newRoom()
         }}>
-            Add new trackList
+        Add new trackList
         </Button>
         <View>
           <View style={{ display: 'flex', alignItems: 'center', height: '70%' }}>
