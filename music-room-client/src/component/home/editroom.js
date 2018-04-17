@@ -14,6 +14,8 @@ import { playTrack, pause, play, isPlayingDeezer } from '../../utils/deezerServi
 import { Constants, Location, Permissions, che } from 'expo'
 import { callApi } from '../../utils/callApi.js'
 
+const interval = 0
+
 class Room extends Component {
 
   state = {
@@ -27,11 +29,10 @@ class Room extends Component {
     listOfColor: [],
     duration: 0,
     next: 0,
-    interval: 0
   }
 
   componentWillUnmount (){
-    clearInterval(this.state.interval);
+    clearInterval(interval);
     pause()
   }
 
@@ -60,7 +61,6 @@ class Room extends Component {
         this.setState({ next: next + 1 })
         if (next === duration) {
           callApi(`room/all/${this.props.userId}/${this.props.user.lat}/${this.props.user.long}`, 'get').then(body => {
-
             const index1 = body.rooms.findIndex(e => e._id === this.props.roomId)
             const songs = body.rooms[index1].songs
             let index = songs.findIndex(e => e.id === currentSong)
@@ -68,7 +68,6 @@ class Room extends Component {
             if (index >= songs.length) { index = 0 }
             this.playTrackWrapper(songs[index].id)
           })
-
         }
         if ((next === 30 || next === 31) && !tmpPlayer) {
           callApi(`room/all/${this.props.userId}/${this.props.user.lat}/${this.props.user.long}`, 'get').then(body => {
@@ -85,23 +84,18 @@ class Room extends Component {
 
   }
   afterSong = () => {
-    console.log("Room : afterSong")        
-    const interval = setInterval((() => {
+    interval = setInterval((() => {
       this.incrementation()
     }), 1000)
-    this.setState({interval})
   }
 
 playTrackWrapper = (id) => {
-  console.log("Room : playTrackWrapper")        
-  
   const { isPlaying } = this.state
   if (isPlaying) { 
     playTrack(id.toString()).then((e) => { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) 
   } else { 
     playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) 
   }
-
   request.get(`https://api.deezer.com/track/${id}`)
     .set('Accept', 'application/json')
     .then((res) => {
@@ -110,8 +104,6 @@ playTrackWrapper = (id) => {
 
 }
   callDezzerapi = (value) => {
-  console.log("Room : callDezzerapi")
-  
     this.setState({ value })
     request.get(`https://api.deezer.com/search?q=${value}`)
       .set('Accept', 'application/json')
@@ -120,8 +112,6 @@ playTrackWrapper = (id) => {
       })
   }
   pausePlay = () => {
-  console.log("Room : pausePlay")
-  
     const { isPlaying, currentSong } = this.state
     const { room } = this.props
     if (!currentSong) {
@@ -133,15 +123,10 @@ playTrackWrapper = (id) => {
   }
 
   nextSong = () => {
-    console.log("Room : nextSong")
-    
     const { currentSong } = this.state
     const { room } = this.props
-
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
-
     const songs = room.rooms[index1].songs
-
     let index = songs.findIndex(e => e.id === currentSong)
     index += 1
     if (index >= songs.length) { index = 0 }
@@ -151,8 +136,6 @@ playTrackWrapper = (id) => {
   }
 
   previousSong = () => {
-    console.log("Room : previousSong")
-    
     const { currentSong } = this.state
     const { room } = this.props
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
@@ -168,8 +151,6 @@ playTrackWrapper = (id) => {
   }
 
   changeLocationType = async () => {
-    console.log("Room : changeLocationType")
-    
     const { room, dispatch, user } = this.props
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
     const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
@@ -194,8 +175,6 @@ playTrackWrapper = (id) => {
   }
 
   distanceChange = (distance) => {
-    console.log("Room : distanceChange")
-    
     const { room, dispatch, user } = this.props
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
     const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
@@ -210,8 +189,6 @@ playTrackWrapper = (id) => {
   }
 
 changeType = (status) => {
-    console.log("Room : changeType")
-  
   const { room, dispatch, user } = this.props
   const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
   const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
@@ -271,9 +248,6 @@ distanceOfCenter = async (vote, songId) => {
   }
 }
   updateVote = (vote, songId) => {
-    console.log("Room : updateVote")
-    
-
     const { room, dispatch, user } = this.props
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
 

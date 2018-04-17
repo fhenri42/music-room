@@ -3,40 +3,11 @@ import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
 import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Card, Button, Switcher, TabButton } from 'nachos-ui'
 import { connect } from 'react-redux'
-import { addSongRoom, updateRoom, getRoom } from '../../actions/room.js'
 // import Playlist from './playlist'
 import { Actions } from 'react-native-router-flux'
 import { Constants, Location, Permissions, LinearGradient } from 'expo'
 
 class ListOfRoom extends Component {
-
-
-  componentWillMount () {
-    this.getRooms()
-    Permissions.askAsync(Permissions.LOCATION).then( status => {
-    Location.getCurrentPositionAsync({}).then(position => {
-      this.setState({lat: position.coords.latitude, long: position.coords.longitude})
-
-    })
-})
-  }
-
-  state = {
-    lat: 0,
-    long: 0,
-  }
-  getRooms = async () => {
-    const { dispatch } = this.props
-    const { status } = await Permissions.askAsync(Permissions.LOCATION)
-    if (status !== 'granted') {
-      dispatch(getRoom({ userId: this.props.user.id }))
-    } else {
-      const position = await Location.getCurrentPositionAsync({})
-      dispatch(getRoom({ userId: this.props.user.id, lat: position.coords.latitude, long: position.coords.longitude }))
-    }
-  }
-
-
 
   render () {
     return (
@@ -53,7 +24,14 @@ class ListOfRoom extends Component {
             )
           })
         )}
-        <Button  kind='squared' onPress={() => Actions.map({room:this.props.room, lat: this.state.lat, long: this.state.long})}> Map</Button>
+        <Button  kind='squared' onPress={() =>
+          Permissions.askAsync(Permissions.LOCATION).then( status => {
+              if (status.status === 'granted') {
+                Location.getCurrentPositionAsync({}).then(position => {
+                Actions.map({room:this.props.room, lat: position.coords.latitude, long: position.coords.longitude})
+            })
+          }
+          })}> Map</Button>
       </ScrollView>
     )
 
