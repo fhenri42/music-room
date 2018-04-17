@@ -5,11 +5,11 @@ import { Field, reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import { RadioGroup, Button, Input } from 'nachos-ui'
-import { createPlayList } from '../../actions/playlist.js'
+import { createRoom } from '../../actions/room.js'
 import Toaster from '../toaster/index.js'
 import { getPlaylists, getPlaylistTracks, checkSession } from '../../utils/deezerService.js'
 
-class NewPlaylist extends Component {
+class NewRoom extends Component {
 
   state = {
     disab: false,
@@ -30,14 +30,14 @@ class NewPlaylist extends Component {
   )
 
   onSubmit = event => {
-
     event.users = []
     event.users.push({ id: this.props.user.id, role: 'RW', email: this.props.user.email, super: true })
-    event.type = this.props.typePlaylist
-    this.props.dispatch(createPlayList(event))
+    event.type = 'public'
+    this.props.dispatch(createRoom(event))
   }
 
   render () {
+
     const { handleSubmit, user } = this.props
     const { disab } = this.state
 
@@ -48,6 +48,7 @@ class NewPlaylist extends Component {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
+          backgroundColor: '#1e1438',
         }}>
         <Text >New track</Text>
         <Field
@@ -61,9 +62,9 @@ class NewPlaylist extends Component {
           name={'description'}
           component={this.renderTextField}
         />
-  
+
         <Button onPress={ handleSubmit(this.onSubmit) }>Create</Button>
-        <Button disabled={!disab} onPress={() => { Actions.importList() }}>Import Play list</Button>
+        {/*  <Button disabled={!disab} onPress={() => { Actions.importList() }}>Import Play list</Button>*/}
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
 
       </View>
@@ -80,15 +81,15 @@ const validate = values => {
   return errors
 }
 
-NewPlaylist = reduxForm({
+NewRoom = reduxForm({
   form: 'singupForm',
   validate,
-})(NewPlaylist)
+})(NewRoom)
 
 const mapStateToProps = state => {
   return {
     user: state.user.toJS(),
-    playlist: state.playlist.toJS(),
+    room: state.room.toJS(),
     notife: state.notife.toJS(),
   }
 }
@@ -97,4 +98,4 @@ const mapDispatchToProps = dispatch => {
   return { dispatch }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewPlaylist)
+export default connect(mapStateToProps, mapDispatchToProps)(NewRoom)

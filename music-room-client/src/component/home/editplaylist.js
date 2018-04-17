@@ -10,9 +10,10 @@ import Player from '../Player'
 import AddUser from './adduser.js'
 import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
-import { playTrack, pause, play } from '../../utils/deezerService.js'
+import { playTrack, pause, play, checkSession, isPlayingDeezer } from '../../utils/deezerService.js'
+import { callApi } from '../../utils/callApi.js'
 
-
+const myTimer = null
 class Playlist extends Component {
 
   state = {
@@ -23,12 +24,65 @@ class Playlist extends Component {
     uri: '',
     isPlaying: false,
     currentSong: '',
+    duration: 0,
+    next: 0,
+    interval: 0
   }
+  
+  componentWillUnmount (){
+    clearInterval(this.state.interval);
+  }
+  componentWillMount () { this.afterSong() }
+
+incrementation = () => {
+
+  const { duration, next, currentSong, isPlaying } = this.state
+  isPlayingDeezer((tmpPlayer) => {
+    if (isPlaying) {
+      this.setState({ next: next + 1 })
+      if (next === duration) {
+        callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
+          const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
+          const songs = body.playLists[index1].songs
+          let index = songs.findIndex(e => e.id === currentSong)
+          index += 1
+          if (index >= songs.length) { index = 0 }
+          this.playTrackWrapper(songs[index].id)
+
+        })
+      }
+      if ((next === 30 || next === 31) && !tmpPlayer) {
+        callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
+          const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
+          const songs = body.playLists[index1].songs
+          let index = songs.findIndex(e => e.id === currentSong)
+          index += 1
+          if (index >= songs.length) { index = 0 }
+          this.playTrackWrapper(songs[index].id)
+        })
+      }
+    }
+  })
+}
+
+afterSong = () => {
+  const interval = setInterval((() => {
+    this.incrementation()
+  }), 1000)
+  this.setState({interval})
+}
 
 playTrackWrapper = (id) => {
   const { isPlaying } = this.state
   if (isPlaying) { playTrack(id).then((e) => { playTrack(id).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }
+
+  request.get(`https://api.deezer.com/track/${id}`)
+    .set('Accept', 'application/json')
+    .then((res) => {
+      this.setState({ duration: res.body.duration })
+    })
 }
+
   callDezzerapi = (value) => {
     this.setState({ value })
     request.get(`https://api.deezer.com/search?q=${value}`)
@@ -38,12 +92,14 @@ playTrackWrapper = (id) => {
       })
   }
   pausePlay = () => {
+
     const { isPlaying, currentSong } = this.state
     const { playlist } = this.props
     if (!currentSong) {
       const index1 = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
       const song = playlist.playlists[index1].songs[0]
-      this.playTrackWrapper(song.id)
+      if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0])
+        this.playTrackWrapper(song.id)
     } else if (!isPlaying) { this.setState({ isPlaying: !isPlaying }); play() } else { this.setState({ isPlaying: !isPlaying }); pause() }
   }
 
@@ -59,7 +115,9 @@ playTrackWrapper = (id) => {
     let index = songs.findIndex(e => e.id === currentSong)
     index += 1
     if (index >= songs.length) { index = 0 }
-    this.playTrackWrapper(songs[index].id)
+    if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0]){
+      this.playTrackWrapper(songs[index].id)
+    }
 
   }
 
@@ -73,9 +131,9 @@ playTrackWrapper = (id) => {
 
     index -= 1
     if (index < 0) { index = 0 }
-
-    this.playTrackWrapper(songs[index].id)
-
+    if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0]){
+      this.playTrackWrapper(songs[index].id)
+    }
   }
 
   updateGrade = (grade, songId) => {
@@ -84,7 +142,7 @@ playTrackWrapper = (id) => {
     const index1 = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
 
     const songs = playlist.playlists[index1].songs
-    const index = songs.findIndex(e => e.id == songId)
+    const index = songs.findIndex(e => e.id === songId)
 
     if (grade > 0) {
 
@@ -110,6 +168,9 @@ playTrackWrapper = (id) => {
     const { playlist, user } = this.props
     const index = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
     const indexUser = playlist.playlists[index].users.findIndex(u => u.id === user.id)
+    let superU = false
+    if (playlist.playlists[index].users[0].email === user.email) { superU = true }
+
     return (
       <View style={{ flex: 1 }}>
         {playlist.playlists[index].users[indexUser].role === 'RW' && (
@@ -151,7 +212,7 @@ playTrackWrapper = (id) => {
                 })
               )}
             </ScrollView >
-            <Player previousSong={this.previousSong} nextSong={this.nextSong} playSong={() => { this.pausePlay() }} />
+            <Player previousSong={this.previousSong} nextSong={this.nextSong} isPlaying={this.state.isPlaying} playSong={() => { this.pausePlay() }} />
           </View>
         )}
 
@@ -190,7 +251,9 @@ playTrackWrapper = (id) => {
           </View>
         )}
 
-        {typeOf === 'addUser' && (<AddUser plId={this.props.playlistId} userId={user.id} users={ playlist.playlists[index].users} />)}
+        { typeOf === 'addUser' && superU === true && (<AddUser plId={this.props.playlistId} userId={user.id} users={ playlist.playlists[index].users} />)}
+        { typeOf === 'addUser' && superU !== true && (<Text style={{ textAlign: 'center' }}>your not allowed to add users</Text>)}
+
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
 
       </View>

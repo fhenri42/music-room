@@ -27,7 +27,7 @@ class FacebookLogin extends React.Component {
         + `&redirect_uri=${encodeURIComponent(redirectUrl)}`,
     })
     this.props.dispatch(facebookLoginAction(result))
-  };
+  }
 }
 
 const styles = StyleSheet.create({

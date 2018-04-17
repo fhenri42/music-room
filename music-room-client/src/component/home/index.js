@@ -10,6 +10,7 @@ import { toJS } from 'immutable'
 import Settings from '../settings/index.js'
 import Toaster from '../toaster/index.js'
 import MusicTrack from './musicTrack.js'
+import { checkSession } from '../../utils/deezerService.js'
 
 class Home extends Component {
 
@@ -20,9 +21,20 @@ class Home extends Component {
         data: token,
       })
     })
+
   }
   state = {
     mode: this.props.mode || 0,
+    disab: false,
+  }
+
+  componentWillReceiveProps (nextProps) {
+    checkSession(((e) => {
+      if (e === false) {
+        this.setState({ mode: 2 })
+      }
+      this.setState({ disab: e })
+    }))
   }
 
   serviceMode = () => { this.setState({ mode: 0 }) }
@@ -31,19 +43,19 @@ class Home extends Component {
   render () {
 
     const { handleSubmit, user, playlist } = this.props
-    const { mode } = this.state
+    const { mode, disab } = this.state
     return (
+
       <View style={{
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-
-        {mode === 0 && (
-          <MusicTrack />
+        {mode === 0 && disab && (
+          <MusicTrack user={user} playlist={playlist} />
         )}
-        {mode === 1 && (
+        {mode === 1 && disab && (
           <Playlist playlist={playlist} user={user}/>
         )}
         {mode === 2 && (
@@ -52,8 +64,8 @@ class Home extends Component {
         )}
         <Menu playListMode={this.playListMode} settingsMode={this.settingsMode} serviceMode={this.serviceMode} />
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
-
       </View>
+
     )
   }
 }

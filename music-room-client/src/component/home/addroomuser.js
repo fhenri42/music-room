@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import { Card, Input, H4, Switcher, TabButton, Button, RadioGroup } from 'nachos-ui'
 
-import { updatePlaylistPrivate, deleteAUser } from '../../actions/playlist.js'
+import { updateRoomPrivate, deleteAUser } from '../../actions/room.js'
 import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
 
@@ -30,13 +30,12 @@ class AddNewUser extends Component {
 
   onSubmit = event => {
 
-    this.props.dispatch(updatePlaylistPrivate(event, this.props.plId, this.props.userId))
+    this.props.dispatch(updateRoomPrivate(event, this.props.plId, this.props.userId))
   }
 
   render () {
 
-    const { handleSubmit, users, user } = this.props
-
+    const { handleSubmit, users } = this.props
     return (
       <View>
         <Field
@@ -65,7 +64,7 @@ class AddNewUser extends Component {
                 name='compare-arrows'
                 type='compare-arrows'
                 color='#f50'
-                onPress={() => { this.props.dispatch(updatePlaylistPrivate({ email: u.email, type: u.role !== 'R' ? 'read' : 'read&&write' }, this.props.plId, this.props.userId)) }} />
+                onPress={() => { this.props.dispatch(updateRoomPrivate({ email: u.email, type: u.role !== 'R' ? 'read' : 'read&&write' }, this.props.plId, this.props.userId)) }} />
               <Text>{u.email}</Text>
               <Text>{` Role: ${u.role}`}</Text>
             </View>)
@@ -94,7 +93,7 @@ AddNewUser = reduxForm({
 const mapStateToProps = state => {
   return {
     user: state.user.toJS(),
-    playlist: state.playlist.toJS(),
+    room: state.room.toJS(),
     notife: state.notife.toJS(),
   }
 }

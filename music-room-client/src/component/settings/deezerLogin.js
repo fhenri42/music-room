@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { AuthSession } from 'expo'
 import { Actions } from 'react-native-router-flux'
-import { connectDeezer } from '../../utils/deezerService.js'
+import { connectDeezer, disconnectDeezer } from '../../utils/deezerService.js'
 
 import { Button } from 'nachos-ui'
 
@@ -16,12 +16,14 @@ export default class DeezerLogin extends React.Component {
   render () {
     return (
       <View style={styles.container}>
-        <Button kind='squared' onPress={() => { connectDeezer().then(res => { console.log(res) }) }}>{'Deezer'}</Button>
+        <Button kind='squared' onPress={() => { connectDeezer().then() }}>{'Deezer'}</Button>
         <Button kind='squared' onPress={() => {
           Expo.SecureStore.deleteItemAsync('token', {}).then(() => {
             Actions.login()
           })
         }}>Log-out</Button>
+        <Button kind='squared' onPress={() => { disconnectDeezer().then() }}>{'Deezer logOut'}</Button>
+
       </View>
     )
   }

@@ -21,11 +21,12 @@ export function createPlayList (data) {
 
   return dispatch => {
     callApi('playlist/create', 'post', data).then(body => {
+      Actions.home({mode:1})
       return dispatch({
         type: 'http/newPlayList',
         data: body,
       })
-      Actions.home()
+
     }).catch(e => {
       return dispatch({
         type: 'client/addNotife',

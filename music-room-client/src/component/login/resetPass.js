@@ -27,7 +27,10 @@ class ResetPass extends Component {
             value={this.state.email}
             onChangeText={value => this.setState({ email: value })}
           />
-          <Button onPress={() => { this.setState({ isSend: true }), this.props.dispatch(resetPass(email)) }}>Send code</Button>
+          <Button onPress={() => {
+            this.setState({ isSend: true })
+            this.props.dispatch(resetPass(email))
+          }}>Send code</Button>
         </View>
         {isSend && (
           <View style={{ flex: 1, width: '90%', alignSelf: 'center' }}>

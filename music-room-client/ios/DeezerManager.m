@@ -21,6 +21,19 @@ RCT_EXPORT_METHOD(connect:(RCTResponseSenderBlock)callback) {
     });
 }
 
+RCT_EXPORT_METHOD(disconnect:(RCTResponseSenderBlock)callback) {
+    _globalBridge = _bridge;
+    
+    NSMutableArray* permissionsArray = [NSMutableArray array];
+    [permissionsArray addObject:DeezerConnectPermissionBasicAccess];
+    [permissionsArray addObject:DeezerConnectPermissionListeningHistory];
+    
+    [DeezerSession sharedSession].initCallback = callback;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[DeezerSession sharedSession] disconnect];
+    });
+}
+
 RCT_EXPORT_METHOD(isSessionValid:(RCTResponseSenderBlock)callback) {
     _globalBridge = _bridge;
     
@@ -28,6 +41,8 @@ RCT_EXPORT_METHOD(isSessionValid:(RCTResponseSenderBlock)callback) {
         callback(@[@YES]);
     }] : callback(@[@NO]);
 }
+
+
 
 RCT_REMAP_METHOD(getFavoritesTracks,
                  resolver:(RCTPromiseResolveBlock)resolve
@@ -52,7 +67,6 @@ RCT_EXPORT_METHOD(playTrack:(NSString *)identifier
     [[DeezerPlayer sharedPlayer] playTrackWithIdentifier:identifier withResolver:resolve andRejecter:reject];
 }
 
-
 RCT_EXPORT_METHOD(pause) {
     [[DeezerPlayer sharedPlayer] pause];
 }
@@ -60,6 +74,12 @@ RCT_EXPORT_METHOD(pause) {
 RCT_EXPORT_METHOD(play) {
     [[DeezerPlayer sharedPlayer] play];
 }
+RCT_EXPORT_METHOD(isPlaying:(RCTResponseSenderBlock)callback) {
+    [[DeezerPlayer sharedPlayer] isPlaying] ? [[DeezerSession sharedSession] getCurrentUserWithCallback:^() {
+        callback(@[@YES]);
+    }] : callback(@[@NO]);
+}
+
 
 #pragma mark - Singleton methods
 

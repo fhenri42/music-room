@@ -128,6 +128,7 @@ export default [
     handler: UserController.verifyEmail,
     validator: [],
   },
+
   {
     method: 'GET',
     path: '/user/resetPassword/:email',
@@ -141,12 +142,18 @@ export default [
     handler: UserController.resetVerefiPassword,
     validator: [],
   },
-  // TODO balacke de la doc
 
   {
     method: 'POST',
     path: '/user/create/facebook',
     handler: UserController.facebookCreate,
+    validator: [],
+  },
+
+  {
+    method: 'POST',
+    path: '/user/link/facebook/:id',
+    handler: UserController.facebookLink,
     validator: [],
   },
 ]

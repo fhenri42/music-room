@@ -53,6 +53,7 @@ state = {
   render () {
 
     const { handleSubmit, initialValues } = this.props
+
     return (
       <View style={{ flex: 1, width: '90%', alignSelf: 'center' }}>
         <Field

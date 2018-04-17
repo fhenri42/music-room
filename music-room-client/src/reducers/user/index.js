@@ -15,11 +15,13 @@ export function login (state, data) {
     .setIn(['isActive'], fromJS(user.isActive))
     .setIn(['id'], fromJS(user.id))
     .setIn(['musicTags'], fromJS(user.musicTags))
+    .setIn(['isFaceBookLogin'], fromJS(user.isFaceBookLogin))
 }
 
 export function verifeUser (state, token) {
 
   const user = jwtDecode(token)
+  Expo.SecureStore.setItemAsync('token', token, {})
 
   return state.setIn(['email'], fromJS(user.email))
     .setIn(['isAuthenticated'], fromJS(true))
@@ -28,5 +30,6 @@ export function verifeUser (state, token) {
     .setIn(['firstName'], fromJS(user.firstName))
     .setIn(['lastName'], fromJS(user.lastName))
     .setIn(['isActive'], fromJS(user.isActive))
+    .setIn(['isFaceBookLogin'], fromJS(user.isFaceBookLogin))
     .setIn(['musicTags'], fromJS(user.musicTags || []))
 }

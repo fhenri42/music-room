@@ -4,7 +4,6 @@ import { Actions } from 'react-native-router-flux'
 export function loginUser (event) {
   return dispatch => {
     callApi(`user/${event.email}/`, 'get', {}, event.password).then(body => {
-
       return dispatch({
         type: 'http/login',
         data: body,
@@ -35,6 +34,24 @@ export function facebookLoginAction (event) {
   return dispatch => {
     callApi('user/create/facebook', 'post', event.params).then(body => {
 
+      return dispatch({
+        type: 'http/login',
+        data: body,
+      })
+    }).catch(e => {
+      return dispatch({
+        type: 'client/addNotife',
+        data: e,
+      })
+    })
+  }
+}
+
+export function facebookLinkAction (event, userId) {
+  console.log('ici')
+  return dispatch => {
+    callApi(`user/link/facebook/${userId}`, 'post', event.params).then(body => {
+      console.log(body)
       return dispatch({
         type: 'http/login',
         data: body,
@@ -98,9 +115,7 @@ export function verifeUser (code, email) {
 
 export function resetPass (email) {
   return dispatch => {
-    callApi(`user/resetPassword/${email}`, 'get').then(body => {
-
-    }).catch(e => {
+    callApi(`user/resetPassword/${email}`, 'get').then().catch(e => {
       return dispatch({
         type: 'client/addNotife',
         data: e,

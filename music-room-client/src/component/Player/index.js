@@ -13,7 +13,7 @@ class Player extends Component {
 
   render () {
 
-    const { playSong, previousSong, nextSong } = this.props
+    const { playSong, previousSong, nextSong, isPlaying } = this.props
 
     return (
       <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
@@ -24,11 +24,10 @@ class Player extends Component {
           type='skip-previous'
           color='#f50'
           onPress={previousSong} />
-
         <Icon
           raised
-          name='play-arrow'
-          type='play-arrow'
+          name={isPlaying !== true ? 'play-arrow' : 'pause'}
+          type={isPlaying !== true ? 'play-arrow' : 'pause'}
           color='#f50'
           onPress={playSong} />
         <Icon

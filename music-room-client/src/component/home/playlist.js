@@ -47,7 +47,7 @@ class Playlist extends Component {
                   type='add'
                   color='#f50'
                   size={15}
-                  onPress={() => { Actions.newplaylist() }} />
+                  onPress={() => { Actions.newplaylist({typePlaylist: 'private'}) }} />
               </View>
               <ScrollView style={{ height: '70%', alignSelf: 'center' }}>
                 { privateArray && privateArray.length !== 0 && (
@@ -77,7 +77,7 @@ class Playlist extends Component {
                   type='add'
                   color='#f50'
                   size={15}
-                  onPress={() => { Actions.newplaylist() }} />
+                  onPress={() => { Actions.newplaylist({typePlaylist: 'public'}) }} />
               </View>
               <ScrollView style={{ height: '70%', alignSelf: 'center' }}>
                 { publicArray && publicArray.length !== 0 && (
