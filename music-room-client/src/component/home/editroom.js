@@ -10,8 +10,9 @@ import Player from '../Player/specialPlayer'
 import AddUser from './addroomuser.js'
 import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
-import { playTrack, pause, play } from '../../utils/deezerService.js'
+import { playTrack, pause, play, isPlayingDeezer } from '../../utils/deezerService.js'
 import { Constants, Location, Permissions, che } from 'expo'
+import { callApi } from '../../utils/callApi.js'
 
 class Room extends Component {
 
@@ -26,18 +27,19 @@ class Room extends Component {
     errorMessage: null,
     location: null,
     listOfColor: [],
+    duration: 0,
+    next: 0,
   }
 
   componentDidMount () {
-    var listOfColor = []
+    const listOfColor = []
     const { room } = this.props
 
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
-
-    for (var i =0;i<1000;i++)
-      listOfColor.push(`rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`)
-    this.setState({ listOfColor })
     this.playTrackWrapper(room.rooms[index].songs[0].id)
+    this.afterSong()
+    for (let i = 0; i < 1000; i++) { listOfColor.push(`rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`) }
+    this.setState({ listOfColor })
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.props.notife.message = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
     } else {
@@ -45,10 +47,56 @@ class Room extends Component {
     }
   }
 
+  incrementation = () => {
+
+    const { duration, next, currentSong, isPlaying } = this.state
+
+    isPlayingDeezer((tmpPlayer) => {
+
+      if (isPlaying) {
+        this.setState({ next: next + 1 })
+        if (next === duration) {
+          callApi(`room/all/${this.props.userId}/${this.props.user.lat}/${this.props.user.long}`, 'get').then(body => {
+
+            const index1 = body.rooms.findIndex(e => e._id === this.props.roomId)
+            const songs = body.rooms[index1].songs
+            let index = songs.findIndex(e => e.id === currentSong)
+            index += 1
+            if (index >= songs.length) { index = 0 }
+            this.playTrackWrapper(songs[index].id)
+          })
+
+        }
+        if ((next === 30 || next === 31) && !tmpPlayer) {
+          callApi(`room/all/${this.props.userId}/${this.props.user.lat}/${this.props.user.long}`, 'get').then(body => {
+            const index1 = body.rooms.findIndex(e => e._id === this.props.roomId)
+            const songs = body.rooms[index1].songs
+            let index = songs.findIndex(e => e.id === currentSong)
+            index += 1
+            if (index >= songs.length) { index = 0 }
+            this.playTrackWrapper(songs[index].id)
+          })
+        }
+      }
+    })
+
+  }
+  afterSong = () => {
+    setInterval((() => {
+      this.incrementation()
+    }), 1000)
+  }
+
 playTrackWrapper = (id) => {
   const { isPlaying } = this.state
-  // rerender
   if (isPlaying) { playTrack(id).then((e) => { playTrack(id).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }
+
+  request.get(`https://api.deezer.com/track/${id}`)
+    .set('Accept', 'application/json')
+    .then((res) => {
+      this.setState({ duration: res.body.duration })
+    })
+
 }
   callDezzerapi = (value) => {
     this.setState({ value })
@@ -214,6 +262,8 @@ distanceOfCenter = async (vote, songId) => {
     const { room, user } = this.props
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
     const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
+    let superU = false
+    if (room.rooms[index].users[0].email === user.email) { superU = true }
     return (
       <View style={{ flex: 1, backgroundColor: '#1e1438' }}>
         {(
@@ -257,7 +307,7 @@ distanceOfCenter = async (vote, songId) => {
                 })
               )}
             </ScrollView >
-            <Player distanceChange={this.distanceChange} distance={room.rooms[index].location.distance} isPlaying={this.state.isPlaying}  active={room.rooms[index].location.active} changeLocationType={this.changeLocationType} type={room.rooms[index].type} changeType={this.changeType} previousSong={this.previousSong} nextSong={this.nextSong} playSong={() => { this.pausePlay() }} />
+            <Player distanceChange={this.distanceChange} distance={room.rooms[index].location.distance} isPlaying={this.state.isPlaying} active={room.rooms[index].location.active} changeLocationType={this.changeLocationType} type={room.rooms[index].type} changeType={this.changeType} previousSong={this.previousSong} nextSong={this.nextSong} playSong={() => { this.pausePlay() }} />
           </View>
         )}
 
@@ -296,7 +346,9 @@ distanceOfCenter = async (vote, songId) => {
           </View>
         )}
 
-        {typeOf === 'addUser' && (<AddUser plId={this.props.roomId} userId={user.id} users={ room.rooms[index].users} />)}
+        {typeOf === 'addUser' && superU === true && (<AddUser plId={this.props.roomId} userId={user.id} users={ room.rooms[index].users} />)}
+        { typeOf === 'addUser' && superU !== true && (<Text style={{ textAlign: 'center' }}>your not allowed to add users</Text>)}
+
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
 
       </View>

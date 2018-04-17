@@ -26,8 +26,8 @@ class Player extends Component {
           onPress={previousSong} />
         <Icon
           raised
-          name={isPlaying === true ? 'play-arrow': 'pause'}
-          type={isPlaying === true ? 'play-arrow': 'pause'}
+          name={isPlaying !== true ? 'play-arrow' : 'pause'}
+          type={isPlaying !== true ? 'play-arrow' : 'pause'}
           color='#f50'
           onPress={playSong} />
         <Icon

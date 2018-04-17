@@ -12,7 +12,6 @@ import Toaster from '../toaster/index.js'
 import MusicTrack from './musicTrack.js'
 import { checkSession } from '../../utils/deezerService.js'
 
-
 class Home extends Component {
 
   componentWillMount () {
@@ -29,12 +28,14 @@ class Home extends Component {
     disab: false,
   }
 
-
-  componentWillReceiveProps (nextProps) { checkSession(((e) => {
-    if(e === false) {
-      this.setState({mode: 2})
-    }
-    this.setState({disab: e}) })) }
+  componentWillReceiveProps (nextProps) {
+    checkSession(((e) => {
+      if (e === false) {
+        this.setState({ mode: 2 })
+      }
+      this.setState({ disab: e })
+    }))
+  }
 
   serviceMode = () => { this.setState({ mode: 0 }) }
   playListMode = () => { this.setState({ mode: 1 }); this.props.dispatch(getPlayList(this.props.user.id)) }
@@ -51,7 +52,7 @@ class Home extends Component {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-        {mode === 0 && disab &&  (
+        {mode === 0 && disab && (
           <MusicTrack user={user} playlist={playlist} />
         )}
         {mode === 1 && disab && (

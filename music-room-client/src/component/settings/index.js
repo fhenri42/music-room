@@ -7,11 +7,11 @@ import { View, TextInput, Text, Button } from 'react-native-ui-lib'
 import Private from './private.js'
 import Public from './public.js'
 import DeezerLogin from './deezerLogin.js'
+import FacebookLogin from '../login/facebookLogin.js'
 
 class Settings extends Component {
 
   render () {
-
     return (
       <View style={{ height: '90%', width: '100%' }}>
         <ScrollView style={{

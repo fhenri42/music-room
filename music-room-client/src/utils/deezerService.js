@@ -12,7 +12,7 @@ export function connectDeezer () {
 export function disconnectDeezer () {
   return new Promise((resolve, reject) => {
     DeezerManager.disconnect((test) => {
-      console.log(test);
+      console.log(test)
     })
   })
 }
@@ -54,7 +54,4 @@ export function pause () { DeezerManager.pause() }
 
 export function play () { DeezerManager.play() }
 
-export function isPlayingDeezer (cb) {
-
-  console.log('ici', DeezerManager.isPlaying);
-  DeezerManager.isPlaying(cb) }
+export function isPlayingDeezer (cb) { DeezerManager.isPlaying(cb) }

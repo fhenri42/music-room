@@ -6,7 +6,12 @@ import { Actions } from 'react-native-router-flux'
 import { Card, Input, H4, Switcher, TabButton, Button, RadioGroup } from 'nachos-ui'
 
 import { updateUserPrivate } from '../../actions/user.js'
+import { facebookLinkAction } from '../../actions/user.js'
+import { AuthSession } from 'expo'
+
 import Toaster from '../toaster/index.js'
+
+const FB_APP_ID = '658620540953187'
 
 class Singup extends Component {
 
@@ -26,12 +31,25 @@ class Singup extends Component {
       options={['read', 'read&&write']}
     />
   )
+
+  _handlePressAsync = async () => {
+    const redirectUrl = AuthSession.getRedirectUrl()
+    const result = await AuthSession.startAsync({
+      authUrl:
+        'https://www.facebook.com/v2.8/dialog/oauth?response_type=token'
+        + `&client_id=${FB_APP_ID}`
+        + `&redirect_uri=${encodeURIComponent(redirectUrl)}`,
+    })
+    this.props.dispatch(facebookLinkAction(result, this.props.user.id))
+  }
+
   onSubmit = event => { this.props.dispatch(updateUserPrivate(event, this.props.user.id)) }
 
   render () {
 
-    const { handleSubmit, initialValues } = this.props
+    const { handleSubmit, initialValues, user } = this.props
 
+    console.log(user)
     return (
       <View style={{ flex: 1, width: '90%', alignSelf: 'center' }}>
         <Field
@@ -46,6 +64,10 @@ class Singup extends Component {
           secureTextEntry={true}
         />
         <Button kind='squared' onPress={handleSubmit(this.onSubmit)}>Update</Button>
+        {!user.isFaceBookLogin && (
+
+          <Button kind='squared' onPress={this._handlePressAsync}>Link facebook account</Button>
+        )}
 
       </View>
     )
@@ -66,7 +88,6 @@ Singup = reduxForm({
 const mapStateToProps = state => {
   return {
     user: state.user.toJS(),
-    initialValues: {},
     notife: state.notife.toJS(),
   }
 }

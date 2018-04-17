@@ -25,12 +25,12 @@ class Player extends Component {
             color='#f50'
             onPress={previousSong} />
 
-            <Icon
-              raised
-              name={isPlaying === true ? 'play-arrow': 'pause'}
-              type={isPlaying === true ? 'play-arrow': 'pause'}
-              color='#f50'
-              onPress={playSong} />
+          <Icon
+            raised
+            name={isPlaying !== true ? 'play-arrow' : 'pause'}
+            type={isPlaying !== true ? 'play-arrow' : 'pause'}
+            color='#f50'
+            onPress={playSong} />
           <Icon
             raised
             name='skip-next'

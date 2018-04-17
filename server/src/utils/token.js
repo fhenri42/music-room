@@ -18,6 +18,7 @@ export function generateToken (user) {
     musicTags: user.musicTags,
     isPrivateInfo: user.isPrivateInfo,
     isActive: user.isActive,
+    isFaceBookLogin: user.isFaceBookLogin,
   }
   let expiresIn = 60 * 60 * 24 // 24 hours
   if (process.env.NODE_ENV !== 'production') {

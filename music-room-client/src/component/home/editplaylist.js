@@ -13,7 +13,7 @@ import Toaster from '../toaster/index.js'
 import { playTrack, pause, play, checkSession, isPlayingDeezer } from '../../utils/deezerService.js'
 import { callApi } from '../../utils/callApi.js'
 
-let myTimer = null
+const myTimer = null
 class Playlist extends Component {
 
   state = {
@@ -30,28 +30,40 @@ class Playlist extends Component {
   componentWillMount () { this.afterSong() }
 
 incrementation = () => {
+
   const { duration, next, currentSong, isPlaying } = this.state
+  isPlayingDeezer((tmpPlayer) => {
+    if (isPlaying) {
+      this.setState({ next: next + 1 })
+      if (next === duration) {
+        callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
+          const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
+          const songs = body.playLists[index1].songs
+          let index = songs.findIndex(e => e.id === currentSong)
+          index += 1
+          if (index >= songs.length) { index = 0 }
+          this.playTrackWrapper(songs[index].id)
 
-  if (isPlaying) {
-    this.setState({next: next+ 1})
-    if (next === duration) {
-      callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
-        const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
-        const songs = body.playLists[index1].songs
-        let index = songs.findIndex(e => e.id === currentSong)
-        index += 1
-        if (index >= songs.length) { index = 0 }
-        this.playTrackWrapper(songs[index].id)
-
-      })
+        })
+      }
+      if ((next === 30 || next === 31) && !tmpPlayer) {
+        callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
+          const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
+          const songs = body.playLists[index1].songs
+          let index = songs.findIndex(e => e.id === currentSong)
+          index += 1
+          if (index >= songs.length) { index = 0 }
+          this.playTrackWrapper(songs[index].id)
+        })
+      }
     }
-  }
+  })
 
 }
 afterSong = () => {
- setInterval((() => {
-   this.incrementation()
- }), 1000)
+  setInterval((() => {
+    this.incrementation()
+  }), 1000)
 }
 
 playTrackWrapper = (id) => {
@@ -61,9 +73,7 @@ playTrackWrapper = (id) => {
   request.get(`https://api.deezer.com/track/${id}`)
     .set('Accept', 'application/json')
     .then((res) => {
-      this.setState({duration: 30})
-
-      //this.setState({duration: res.body.duration})
+      this.setState({ duration: res.body.duration })
     })
 }
 
@@ -149,9 +159,9 @@ playTrackWrapper = (id) => {
     const { playlist, user } = this.props
     const index = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
     const indexUser = playlist.playlists[index].users.findIndex(u => u.id === user.id)
-    console.log(isPlayingDeezer((e) => {
-      console.log('e =>',e);
-    }));
+    let superU = false
+    if (playlist.playlists[index].users[0].email === user.email) { superU = true }
+
     return (
       <View style={{ flex: 1 }}>
         {playlist.playlists[index].users[indexUser].role === 'RW' && (
@@ -193,7 +203,7 @@ playTrackWrapper = (id) => {
                 })
               )}
             </ScrollView >
-            <Player previousSong={this.previousSong} nextSong={this.nextSong}  isPlaying={this.state.isPlaying} playSong={() => { this.pausePlay() }} />
+            <Player previousSong={this.previousSong} nextSong={this.nextSong} isPlaying={this.state.isPlaying} playSong={() => { this.pausePlay() }} />
           </View>
         )}
 
@@ -232,7 +242,9 @@ playTrackWrapper = (id) => {
           </View>
         )}
 
-        {typeOf === 'addUser' && (<AddUser plId={this.props.playlistId} userId={user.id} users={ playlist.playlists[index].users} />)}
+        { typeOf === 'addUser' && superU === true && (<AddUser plId={this.props.playlistId} userId={user.id} users={ playlist.playlists[index].users} />)}
+        { typeOf === 'addUser' && superU !== true && (<Text style={{ textAlign: 'center' }}>your not allowed to add users</Text>)}
+
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
 
       </View>

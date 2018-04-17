@@ -47,6 +47,24 @@ export function facebookLoginAction (event) {
   }
 }
 
+export function facebookLinkAction (event, userId) {
+  console.log('ici')
+  return dispatch => {
+    callApi(`user/link/facebook/${userId}`, 'post', event.params).then(body => {
+      console.log(body)
+      return dispatch({
+        type: 'http/login',
+        data: body,
+      })
+    }).catch(e => {
+      return dispatch({
+        type: 'client/addNotife',
+        data: e,
+      })
+    })
+  }
+}
+
 export function updateUser (event, userId) {
   return dispatch => {
     callApi(`user/update/${userId}`, 'post', event).then(body => {

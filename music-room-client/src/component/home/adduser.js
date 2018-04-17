@@ -35,7 +35,8 @@ class AddNewUser extends Component {
 
   render () {
 
-    const { handleSubmit, users } = this.props
+    const { handleSubmit, users, user } = this.props
+
     return (
       <View>
         <Field

@@ -8,22 +8,22 @@ const createParams = '{name,description,location,type,users,songs}'
 const updateParamsPublic = '{songs,users,description,location,type}'
 const updateParamsPrivate = '{type,email,location}'
 
-function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-  var R = 6371; // Radius of the earth in km
-  var dLat = deg2rad(lat2-lat1);  // deg2rad below
-  var dLon = deg2rad(lon2-lon1); 
-  var a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2)
-    ; 
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-  var d = R * c; // Distance in km
-  return d;
+function getDistanceFromLatLonInKm (lat1, lon1, lat2, lon2) {
+  const R = 6371 // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1) // deg2rad below
+  const dLon = deg2rad(lon2 - lon1)
+  const a
+    = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
+    * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const d = R * c // Distance in km
+  return d
 }
 
-function deg2rad(deg) {
-  return deg * (Math.PI/180)
+function deg2rad (deg) {
+  return deg * (Math.PI / 180)
 }
 
 export default class RoomController {
@@ -38,9 +38,9 @@ export default class RoomController {
 
       const room = new Room({
         location: {
-            active: 0,
-            distance: 0,
-            center: {lat: 0, long: 0}
+          active: 0,
+          distance: 0,
+          center: { lat: 0, long: 0 },
         },
         name: params.name,
         description: params.description,
@@ -50,7 +50,7 @@ export default class RoomController {
 
       room.save(err => {
         if (err) { return res.status(500).send({ message: 'internal serveur error' }) }
-        return res.json({ message: 'Your room', room: room })
+        return res.json({ message: 'Your room', room })
       })
     }).catch(() => {
       return res.status(500).send({ message: 'Internal serveur error' })
@@ -79,15 +79,15 @@ export default class RoomController {
   static getRoomAll (req, res) {
     Room.find().then(rooms => {
       const arrayToSend = []
-      rooms.forEach(room => { 
-        if (room.type === 'public' ||
-        (room.type === 'private' && req.params.long && req.params.lat && room.location.active === 1 && 
-        (getDistanceFromLatLonInKm(room.location.center.lat, room.location.center.long, req.params.lat, req.params.long) <=  room.location.distance))) {
-          arrayToSend.push(room) 
-        }else{
-          room.users.forEach(u => {if (u.id === req.params.userId && room.type === 'private') {arrayToSend.push(room) }})
+      rooms.forEach(room => {
+        if (room.type === 'public'
+        || (room.type === 'private' && req.params.long && req.params.lat && room.location.active === 1
+        && (getDistanceFromLatLonInKm(room.location.center.lat, room.location.center.long, req.params.lat, req.params.long) <= room.location.distance))) {
+          arrayToSend.push(room)
+        } else {
+          room.users.forEach(u => { if (u.id === req.params.userId && room.type === 'private') { arrayToSend.push(room) } })
         }
-        })
+      })
       return res.json({ message: 'Your rooms', rooms: arrayToSend }) /* istanbul ignore next */
     }).catch(() => { return res.status(500).send({ message: 'Internal serveur error' }) })
   }
@@ -158,7 +158,7 @@ export default class RoomController {
 
     Room.findOne({ _id: req.params.roomId }).then(room => {
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
-    Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: params }, { new: true }).then(room => {
+      Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: params }, { new: true }).then(room => {
         room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
 
         return res.json({ message: 'Your room', room })

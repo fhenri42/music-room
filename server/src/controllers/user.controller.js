@@ -55,6 +55,34 @@ export default class UserController {
 
   }
 
+  static facebookLink (req, res) {
+
+    FB.setAccessToken(req.body.access_token.toString())
+    FB.api('me', { fields: 'id,name,email,first_name,last_name', access_token: req.body.access_token.toString() }, ((fbRes) => {
+      User.findOne({ _id: req.params.id }).then(u => {
+        if (u) {
+          const toSave = {
+            url: fbRes.url,
+            firstName: fbRes.first_name,
+            lastName: fbRes.last_name,
+            isFaceBookLogin: true,
+          }
+          User.findOneAndUpdate({ _id: req.params.id }, { $set: toSave }, { new: true }).then(user => {
+            const token = generateToken(user)
+            return res.json({ token }) /* istanbul ignore next */
+          })
+        } else {
+          return res.status(403).send({ message: 'What the fuck are you doing ?' })
+
+        }
+
+      }).catch(() => {
+        return res.status(500).send({ message: 'Internal serveur error' })
+      })
+    }))
+
+  }
+
   static create (req, res) {
 
     const params = filter(req.body, createParams)
