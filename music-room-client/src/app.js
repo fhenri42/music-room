@@ -16,6 +16,7 @@ import ResetPass from './component/login/resetPass'
 import ImportList from './component/home/importPlaylist.js'
 import Room from './component/home/editroom'
 import NewRoom from './component/home/newRoom'
+import MapRoom from './component/mapRoom'
 
 class App extends Component {
   render () {
@@ -72,6 +73,11 @@ class App extends Component {
             component={Room}
             hideNavBar={false}
             title='Edit the room'
+          />
+          <Scene key='map'
+            component={MapRoom}
+            hideNavBar={false}
+            title='Map of rooms'
           />
         </Stack>
       </Router>

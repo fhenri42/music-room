@@ -12,6 +12,7 @@ import Toaster from '../toaster/index.js'
 import MusicTrack from './musicTrack.js'
 import { checkSession } from '../../utils/deezerService.js'
 
+
 class Home extends Component {
 
   componentWillMount () {
