@@ -74,7 +74,7 @@ afterSong = () => {
 
 playTrackWrapper = (id) => {
   const { isPlaying } = this.state
-  if (isPlaying) { playTrack(id).then((e) => { playTrack(id).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }
+  if (isPlaying) { playTrack(id.toString()).then((e) => { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }
 
   request.get(`https://api.deezer.com/track/${id}`)
     .set('Accept', 'application/json')
@@ -173,7 +173,7 @@ playTrackWrapper = (id) => {
 
     return (
       <View style={{ flex: 1 }}>
-        {playlist.playlists[index].users[indexUser].role === 'RW' && (
+        {  index != -1 && indexUser != -1 && playlist.playlists != null && playlist.playlists[index].users != null && playlist.playlists[index].users[indexUser].role === 'RW' && (
           <Switcher
             onChange={valueOne => { this.setState({ typeOf: valueOne }) }}
             defaultSelected={typeOf}
@@ -189,7 +189,7 @@ playTrackWrapper = (id) => {
                 playlist.playlists[index].songs.map((s, key) => {
                   return (
                     <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                      {playlist.playlists[index].users[indexUser].role === 'RW' && (
+                      {  index != -1 && indexUser != -1 && playlist.playlists != null && playlist.playlists[index].users != null && playlist.playlists[index].users[indexUser].role === 'RW' && (
                         <Icon
                           raised
                           name='keyboard-arrow-up'
@@ -198,7 +198,7 @@ playTrackWrapper = (id) => {
                           size={15}
                           onPress={() => { if (key !== 0) { this.updateGrade(1, s.id) } }} />
                       )}
-                      {playlist.playlists[index].users[indexUser].role === 'RW' && (
+                      {  index != -1 && indexUser != -1 && playlist.playlists != null && playlist.playlists[index].users != null && playlist.playlists[index].users[indexUser].role === 'RW' && (
                         <Icon
                           raised
                           name='keyboard-arrow-down'

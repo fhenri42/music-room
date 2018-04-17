@@ -34,6 +34,7 @@ class Room extends Component {
 
   componentWillUnmount (){
     clearInterval(this.state.interval);
+    pause()
   }
 
   componentDidMount () {
@@ -296,7 +297,7 @@ distanceOfCenter = async (vote, songId) => {
     let superU = false
     if (room.rooms[index].users[0].email === user.email) { superU = true }
     return (
-      <View style={{ flex: 1, backgroundColor: '#1e1438' }}>
+      <View style={{ flex: 1 }}>
         {(
           <Switcher
             onChange={valueOne => { this.setState({ typeOf: valueOne }) }}

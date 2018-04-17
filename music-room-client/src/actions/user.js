@@ -3,7 +3,7 @@ import { Actions } from 'react-native-router-flux'
 
 export function loginUser (event) {
   return dispatch => {
-    callApi(`user/${event.email}/`, 'get', {}, event.password).then(body => {
+    callApi(`user/${event.email.toLowerCase()}/`, 'get', {}, event.password).then(body => {
       return dispatch({
         type: 'http/login',
         data: body,
@@ -18,6 +18,7 @@ export function loginUser (event) {
 }
 
 export function singupUser (event) {
+  event.email = event.email.toLowerCase()
   return dispatch => {
     callApi('user/create', 'post', event).then(() => {
       return Actions.code({ email: event.email })

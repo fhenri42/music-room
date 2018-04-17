@@ -15,8 +15,8 @@ var token = ""
 chai.should()
 const assert = require('chai').assert
 describe('Test of UserController', () => {
+	var endpoint = 'user/create'
 	it('Create user', (done) => {
-		var endpoint = 'user/create'
 		request.post(`${serverUrl}/${endpoint}`)
 			.send(user)
 			.set('Accept', 'application/json')
@@ -34,6 +34,7 @@ describe('Test of UserController', () => {
 		endpoint = `user/${user.email}`
 		request.get(`${serverUrl}/${endpoint}`)
 			.set('Accept', 'application/json')
+			.set('x-pass', 'fwefewfewfewfewfewfewfew')
 			.then((res) => {
 				assert.equal(res.statusCode, '200')
 				done()
