@@ -21,10 +21,8 @@ class Room extends Component {
     info: [],
     typeOf: 'play',
     currentList: [],
-    uri: '',
     isPlaying: false,
     currentSong: '',
-    errorMessage: null,
     location: null,
     listOfColor: [],
     duration: 0,
@@ -38,7 +36,6 @@ class Room extends Component {
   }
 
   componentDidMount () {
-    console.log("ROOM : componentDidMount")
     const listOfColor = []
     const { room } = this.props
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
@@ -46,12 +43,10 @@ class Room extends Component {
       this.playTrackWrapper(room.rooms[index].songs[0].id)
     }
     this.afterSong()
-    for (let i = 0; i < 1000; i++) { listOfColor.push(`rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`) }
-    this.setState({ listOfColor })
+    // for (let i = 0; i < 1000; i++) { listOfColor.push(`rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`) }
+    // this.setState({ listOfColor })
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.props.notife.message = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
-    } else {
-      // this._getLocationAsync();
     }
   }
 
@@ -62,7 +57,6 @@ class Room extends Component {
     isPlayingDeezer((tmpPlayer) => {
 
       if (isPlaying) {
-        console.log('next =>', next)
         this.setState({ next: next + 1 })
         if (next === duration) {
           callApi(`room/all/${this.props.userId}/${this.props.user.lat}/${this.props.user.long}`, 'get').then(body => {
@@ -102,7 +96,11 @@ playTrackWrapper = (id) => {
   console.log("Room : playTrackWrapper")        
   
   const { isPlaying } = this.state
-  if (isPlaying) { playTrack(id).then((e) => { playTrack(id).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }
+  if (isPlaying) { 
+    playTrack(id.toString()).then((e) => { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) 
+  } else { 
+    playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) 
+  }
 
   request.get(`https://api.deezer.com/track/${id}`)
     .set('Accept', 'application/json')
@@ -290,7 +288,7 @@ distanceOfCenter = async (vote, songId) => {
     const inputStyle = { margin: 15 }
     const cardStyle = { width: 200 }
 
-    const { info, value, typeOf, currentList, uri, currentSong } = this.state
+    const { info, value, typeOf, currentList, currentSong } = this.state
     const { room, user } = this.props
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
     const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
@@ -312,7 +310,7 @@ distanceOfCenter = async (vote, songId) => {
             <ScrollView style={{ height: '60%' }}>
               { !!room && !!room.rooms && room.rooms[index].songs !== 0 && (
                 room.rooms[index].songs.map((s, key) => {
-                  const color = this.state.listOfColor[key % 1000]
+                  const color = 'black'
                   return (
                     <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: color }}>
                       {(
@@ -367,7 +365,7 @@ distanceOfCenter = async (vote, songId) => {
                         image={e.album.cover_big}
                         style={cardStyle}
                       />
-                      <Button style={{ backgroundColor: this.state.listOfColor[key % 1000] }} onPress={() => { this.props.dispatch(addSongRoom(e.id, this.props.roomId, this.props.userId, e.title)) }}>{'Add Song'}</Button>
+                      <Button style={{ backgroundColor: 'black' }} onPress={() => { this.props.dispatch(addSongRoom(e.id, this.props.roomId, this.props.userId, e.title)) }}>{'Add Song'}</Button>
                     </View>
                   )
                 })

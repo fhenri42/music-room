@@ -11,6 +11,9 @@ import { Icon } from 'react-native-elements'
 
 class Player extends Component {
 
+  componentDidMount(){
+    console.log("Player : componentDidMount")    
+  }
   render() {
 
     const { playSong, previousSong, nextSong, changeType, changeLocationType, distanceChange, distance, active, isPlaying } = this.props

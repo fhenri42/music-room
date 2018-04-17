@@ -36,8 +36,7 @@ class MusicTrack extends Component {
 const mapStateToProps = state => {
   return {
     user: state.user.toJS(),
-    room: state.room.toJS(),
-    notife: state.notife.toJS(),
+    room: state.room.toJS()
   }
 }
 

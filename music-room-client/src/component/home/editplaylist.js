@@ -30,7 +30,9 @@ class Playlist extends Component {
   }
   
   componentWillUnmount (){
-    clearInterval(this.state.interval);
+    clearInterval(this.state.interval)
+    pause()
+    
   }
   componentWillMount () { this.afterSong() }
 

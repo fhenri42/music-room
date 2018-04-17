@@ -49,7 +49,7 @@ class ListOfRoom extends Component {
               style={{ margin: 15,
                 width: 280,
                 borderColor: 'orange',
-                backgroundColor: `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})` }}>{p.name}</Button>
+                backgroundColor: 'black' }}>{p.name}</Button>
             )
           })
         )}
