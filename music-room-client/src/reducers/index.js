@@ -35,7 +35,7 @@ const intialStateNotife = {
 }
 
 const initialClassement = {
-  songs: []
+  songs: [],
 }
 
 export default class reducer {
@@ -85,10 +85,9 @@ export default class reducer {
     }
   }
 
-  static classement(state = fromJS(initialClassement), action) {
+  static classement (state = fromJS(initialClassement), action) {
     switch (action.type) {
     case 'http/getClassement':
-      console.log('hello')
       return getClassement(state, action.data)
     case 'http/updateClassement':
       return getClassement(state, action.data)

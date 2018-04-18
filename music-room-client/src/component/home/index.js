@@ -1,20 +1,17 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, Button } from 'react-native-ui-lib'
+import { View } from 'react-native-ui-lib'
 import { connect } from 'react-redux'
-import { WebView, Dimensions } from 'react-native'
-import { Actions } from 'react-native-router-flux'
 import Menu from './menu.js'
 import Playlist from './playlist.js'
 import { getPlayList } from '../../actions/playlist.js'
-import { getClassement, updateClassement, createClassement } from '../../actions/classement.js'
+import { createClassement } from '../../actions/classement.js'
 import { toJS } from 'immutable'
 import Settings from '../settings/index.js'
 import Toaster from '../toaster/index.js'
 import MusicTrack from './musicTrack.js'
 import { checkSession } from '../../utils/deezerService.js'
-import { Constants, Location, Permissions } from 'expo'
+import { Location, Permissions } from 'expo'
 import { getRoom } from '../../actions/room.js'
-
 
 class Home extends Component {
 
@@ -23,7 +20,7 @@ class Home extends Component {
     disab: false,
   }
 
-  componentWillMount() {
+  componentWillMount () {
     const { dispatch } = this.props
     this.props.dispatch(createClassement(null))
     Permissions.askAsync(Permissions.LOCATION).then(status => {
@@ -37,7 +34,7 @@ class Home extends Component {
       }
     })
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps () {
     checkSession(((e) => {
       if (e === false) {
         this.setState({ mode: 2 })
@@ -65,7 +62,7 @@ class Home extends Component {
   settingsMode= () => { this.setState({ mode: 2 }) }
   render () {
 
-    const { handleSubmit, user, playlist } = this.props
+    const { user, playlist } = this.props
     const { mode, disab } = this.state
     return (
 
@@ -75,18 +72,18 @@ class Home extends Component {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      {mode === 0 && disab && (
-        <MusicTrack user={user} playlist={playlist} />
-      )}
-      {mode === 1 && disab && (
-        <Playlist playlist={playlist} user={user}/>
-      )}
-      {mode === 2 && (
+        {mode === 0 && disab && (
+          <MusicTrack user={user} playlist={playlist} />
+        )}
+        {mode === 1 && disab && (
+          <Playlist playlist={playlist} user={user}/>
+        )}
+        {mode === 2 && (
 
-        <Settings />
-      )}
-      <Menu playListMode={this.playListMode} settingsMode={this.settingsMode} serviceMode={this.serviceMode} />
-      {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
+          <Settings />
+        )}
+        <Menu playListMode={this.playListMode} settingsMode={this.settingsMode} serviceMode={this.serviceMode} />
+        {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
       </View>
 
     )

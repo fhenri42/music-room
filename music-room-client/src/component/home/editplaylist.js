@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, WebView, Dimensions } from 'react-native'
-import { Actions } from 'react-native-router-flux'
-import { Card, Input, H4, Switcher, TabButton, Button } from 'nachos-ui'
+import { View, Text } from 'react-native-ui-lib'
+import { ScrollView } from 'react-native'
+import { Card, Input, Switcher, TabButton, Button } from 'nachos-ui'
 import { connect } from 'react-redux'
 import { addSongPlaylist, updatePlaylist } from '../../actions/playlist.js'
 import request from 'superagent'
@@ -10,10 +9,10 @@ import Player from '../Player'
 import AddUser from './adduser.js'
 import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
-import { playTrack, pause, play, checkSession, isPlayingDeezer } from '../../utils/deezerService.js'
+import { playTrack, pause, play, isPlayingDeezer } from '../../utils/deezerService.js'
 import { callApi } from '../../utils/callApi.js'
 
-const interval = null
+let interval = null
 class Playlist extends Component {
 
   state = {
@@ -27,7 +26,7 @@ class Playlist extends Component {
     next: 0,
   }
 
-  componentWillUnmount (){
+  componentWillUnmount () {
     clearInterval(interval)
     pause()
 
@@ -73,7 +72,7 @@ afterSong = () => {
 
 playTrackWrapper = (id) => {
   const { isPlaying } = this.state
-  if (isPlaying) { playTrack(id.toString()).then((e) => { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }
+  if (isPlaying) { playTrack(id.toString()).then(() => { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) }
 
   request.get(`https://api.deezer.com/track/${id}`)
     .set('Accept', 'application/json')
@@ -97,8 +96,7 @@ playTrackWrapper = (id) => {
     if (!currentSong) {
       const index1 = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
       const song = playlist.playlists[index1].songs[0]
-      if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0])
-        this.playTrackWrapper(song.id)
+      if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0]) { this.playTrackWrapper(song.id) }
     } else if (!isPlaying) { this.setState({ isPlaying: !isPlaying }); play() } else { this.setState({ isPlaying: !isPlaying }); pause() }
   }
 
@@ -114,7 +112,7 @@ playTrackWrapper = (id) => {
     let index = songs.findIndex(e => e.id === currentSong)
     index += 1
     if (index >= songs.length) { index = 0 }
-    if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0]){
+    if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0]) {
       this.playTrackWrapper(songs[index].id)
     }
 
@@ -130,7 +128,7 @@ playTrackWrapper = (id) => {
 
     index -= 1
     if (index < 0) { index = 0 }
-    if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0]){
+    if (playlist.playlists[index1] && playlist.playlists[index1].songs && playlist.playlists[index1].songs[0]) {
       this.playTrackWrapper(songs[index].id)
     }
   }
@@ -163,7 +161,7 @@ playTrackWrapper = (id) => {
     const inputStyle = { margin: 15 }
     const cardStyle = { width: 200 }
 
-    const { info, value, typeOf, currentList, currentSong } = this.state
+    const { info, typeOf } = this.state
     const { playlist, user } = this.props
     const index = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
     const indexUser = playlist.playlists[index].users.findIndex(u => u.id === user.id)
@@ -172,7 +170,7 @@ playTrackWrapper = (id) => {
 
     return (
       <View style={{ flex: 1 }}>
-        {  index != -1 && indexUser != -1 && playlist.playlists != null && playlist.playlists[index].users != null && playlist.playlists[index].users[indexUser].role === 'RW' && (
+        { index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
           <Switcher
             onChange={valueOne => { this.setState({ typeOf: valueOne }) }}
             defaultSelected={typeOf}
@@ -188,7 +186,7 @@ playTrackWrapper = (id) => {
                 playlist.playlists[index].songs.map((s, key) => {
                   return (
                     <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                      {  index != -1 && indexUser != -1 && playlist.playlists != null && playlist.playlists[index].users != null && playlist.playlists[index].users[indexUser].role === 'RW' && (
+                      { index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
                         <Icon
                           raised
                           name='keyboard-arrow-up'
@@ -197,7 +195,7 @@ playTrackWrapper = (id) => {
                           size={15}
                           onPress={() => { if (key !== 0) { this.updateGrade(1, s.id) } }} />
                       )}
-                      {  index != -1 && indexUser != -1 && playlist.playlists != null && playlist.playlists[index].users != null && playlist.playlists[index].users[indexUser].role === 'RW' && (
+                      { index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
                         <Icon
                           raised
                           name='keyboard-arrow-down'

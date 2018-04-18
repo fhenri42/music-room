@@ -49,10 +49,8 @@ export function facebookLoginAction (event) {
 }
 
 export function facebookLinkAction (event, userId) {
-  console.log('ici')
   return dispatch => {
     callApi(`user/link/facebook/${userId}`, 'post', event.params).then(body => {
-      console.log(body)
       return dispatch({
         type: 'http/login',
         data: body,

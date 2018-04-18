@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
-import { Card, Button, Switcher, TabButton } from 'nachos-ui'
+import { ScrollView } from 'react-native'
+import { Button } from 'nachos-ui'
 import { connect } from 'react-redux'
 // import Playlist from './playlist'
 import { Actions } from 'react-native-router-flux'
-import { Constants, Location, Permissions, LinearGradient } from 'expo'
+import { Location, Permissions } from 'expo'
 
 class ListOfRoom extends Component {
 
@@ -16,21 +15,21 @@ class ListOfRoom extends Component {
           this.props.room.rooms.map((p, key) => {
             return (
               <Button key={key} onPress={() => { Actions.editRoom({ roomId: p._id, userId: this.props.user.id }) }}
-              kind='squared'
-              style={{ margin: 15,
-                width: 280,
-                borderColor: 'orange',
-                backgroundColor: 'black' }}>{p.name}</Button>
+                kind='squared'
+                style={{ margin: 15,
+                  width: 280,
+                  borderColor: 'orange',
+                  backgroundColor: 'black' }}>{p.name}</Button>
             )
           })
         )}
-        <Button  kind='squared' onPress={() =>
-          Permissions.askAsync(Permissions.LOCATION).then( status => {
-              if (status.status === 'granted') {
-                Location.getCurrentPositionAsync({}).then(position => {
-                Actions.map({room:this.props.room, lat: position.coords.latitude, long: position.coords.longitude})
-            })
-          }
+        <Button kind='squared' onPress={() =>
+          Permissions.askAsync(Permissions.LOCATION).then(status => {
+            if (status.status === 'granted') {
+              Location.getCurrentPositionAsync({}).then(position => {
+                Actions.map({ room: this.props.room, lat: position.coords.latitude, long: position.coords.longitude })
+              })
+            }
           })}> Map</Button>
       </ScrollView>
     )

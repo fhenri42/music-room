@@ -1,11 +1,7 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
 import { Router, Scene, Stack } from 'react-native-router-flux'
-import { connect, Provider } from 'react-redux'
 // import BackgroundGeolocation from "react-native-background-geolocation";
 
-import { Toast } from 'react-native-ui-lib'
 import Home from './component/home/index'
 import NewPlaylist from './component/home/newplaylist.js'
 import Login from './component/login'
@@ -80,7 +76,7 @@ class App extends Component {
             hideNavBar={false}
             title='Map of rooms'
           />
-            <Scene key='classement'
+          <Scene key='classement'
             component={Classement}
             hideNavBar={false}
             title='Top music'

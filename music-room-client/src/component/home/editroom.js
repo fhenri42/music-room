@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, WebView, Dimensions, Platform } from 'react-native'
-import { Actions } from 'react-native-router-flux'
+import { View, Text } from 'react-native-ui-lib'
+import { ScrollView, Platform } from 'react-native'
 import { Card, Input, H4, Switcher, TabButton, Button } from 'nachos-ui'
 import { connect } from 'react-redux'
 import { addSongRoom, updateRoom } from '../../actions/room.js'
@@ -11,10 +10,10 @@ import AddUser from './addroomuser.js'
 import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
 import { playTrack, pause, play, isPlayingDeezer } from '../../utils/deezerService.js'
-import { Constants, Location, Permissions, che } from 'expo'
+import { Constants, Location, Permissions } from 'expo'
 import { callApi } from '../../utils/callApi.js'
 
-const interval = 0
+let interval = 0
 
 class Room extends Component {
 
@@ -26,26 +25,22 @@ class Room extends Component {
     isPlaying: false,
     currentSong: '',
     location: null,
-    listOfColor: [],
     duration: 0,
     next: 0,
   }
 
-  componentWillUnmount (){
-    clearInterval(interval);
+  componentWillUnmount () {
+    clearInterval(interval)
     pause()
   }
 
   componentDidMount () {
-    const listOfColor = []
     const { room } = this.props
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
-    if (room.rooms && index !== -1 && room.rooms[index].songs && room.rooms[index].songs[0]){
+    if (room.rooms && index !== -1 && room.rooms[index].songs && room.rooms[index].songs[0]) {
       this.playTrackWrapper(room.rooms[index].songs[0].id)
     }
     this.afterSong()
-    // for (let i = 0; i < 1000; i++) { listOfColor.push(`rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})`) }
-    // this.setState({ listOfColor })
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.props.notife.message = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
     }
@@ -91,10 +86,10 @@ class Room extends Component {
 
 playTrackWrapper = (id) => {
   const { isPlaying } = this.state
-  if (isPlaying) { 
-    playTrack(id.toString()).then((e) => { playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) }) 
-  } else { 
-    playTrack(id.toString()).then((e) => { this.setState({ isPlaying: true, currentSong: id }) }) 
+  if (isPlaying) {
+    playTrack(id.toString()).then(() => { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) })
+  } else {
+    playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) })
   }
   request.get(`https://api.deezer.com/track/${id}`)
     .set('Accept', 'application/json')
@@ -117,8 +112,7 @@ playTrackWrapper = (id) => {
     if (!currentSong) {
       const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
       const song = room.rooms[index1].songs[0]
-      if (room.rooms[index1] && room.rooms[index1].songs && room.rooms[index1].songs[0])
-        this.playTrackWrapper(song.id)
+      if (room.rooms[index1] && room.rooms[index1].songs && room.rooms[index1].songs[0]) { this.playTrackWrapper(song.id) }
     } else if (!isPlaying) { this.setState({ isPlaying: !isPlaying }); play() } else { this.setState({ isPlaying: !isPlaying }); pause() }
   }
 
@@ -130,7 +124,7 @@ playTrackWrapper = (id) => {
     let index = songs.findIndex(e => e.id === currentSong)
     index += 1
     if (index >= songs.length) { index = 0 }
-    if (room.rooms[index1] && room.rooms[index1].songs && room.rooms[index1].songs[0]){
+    if (room.rooms[index1] && room.rooms[index1].songs && room.rooms[index1].songs[0]) {
       this.playTrackWrapper(songs[index].id)
     }
   }
@@ -145,7 +139,7 @@ playTrackWrapper = (id) => {
 
     index -= 1
     if (index < 0) { index = 0 }
-    if (room.rooms[index1] && room.rooms[index1].songs && room.rooms[index1].songs[0]){
+    if (room.rooms[index1] && room.rooms[index1].songs && room.rooms[index1].songs[0]) {
       this.playTrackWrapper(songs[index].id)
     }
   }
@@ -188,7 +182,7 @@ playTrackWrapper = (id) => {
     }
   }
 
-changeType = (status) => {
+changeType = () => {
   const { room, dispatch, user } = this.props
   const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
   const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
@@ -221,8 +215,6 @@ deg2rad = (deg) => {
 }
 
 distanceOfCenter = async (vote, songId) => {
-    console.log("Room : distanceOfCenter")
-  
   const { room, dispatch, user } = this.props
   const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
   const center = room.rooms[index1].location.center
@@ -262,10 +254,9 @@ distanceOfCenter = async (vote, songId) => {
     const inputStyle = { margin: 15 }
     const cardStyle = { width: 200 }
 
-    const { info, value, typeOf, currentList, currentSong } = this.state
+    const { info, typeOf } = this.state
     const { room, user } = this.props
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
-    const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
     let superU = false
     if (room.rooms[index].users[0].email === user.email) { superU = true }
     return (

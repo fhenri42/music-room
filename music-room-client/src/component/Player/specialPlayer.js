@@ -1,17 +1,11 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, WebView, Dimensions } from 'react-native'
-import { Actions } from 'react-native-router-flux'
-import { Slider, Card, Input, H4, Switcher, TabButton, Button } from 'nachos-ui'
-import { connect } from 'react-redux'
-import { addSongPlaylist } from '../../actions/playlist.js'
-import request from 'superagent'
-
+import { View } from 'react-native-ui-lib'
+import { Slider, H4 } from 'nachos-ui'
 import { Icon } from 'react-native-elements'
 
 class Player extends Component {
 
-  render() {
+  render () {
 
     const { playSong, previousSong, nextSong, changeType, changeLocationType, distanceChange, distance, active, isPlaying } = this.props
 

@@ -1,5 +1,4 @@
 import { fromJS } from 'immutable'
-import { Actions } from 'react-native-router-flux'
 
 export function updateListOfRoom (state, data) {
   const rooms = state.getIn(['rooms']).toJS()

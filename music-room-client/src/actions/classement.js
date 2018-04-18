@@ -2,7 +2,7 @@ import { callApi } from '../utils/callApi.js'
 
 export function getClassement (user) {
   return dispatch => {
-    callApi(`classement/all`, 'get').then(body => {
+    callApi('classement/all', 'get').then(body => {
       return dispatch({
         type: 'http/getClassement',
         data: body,
@@ -19,7 +19,6 @@ export function createClassement (data) {
 
   return dispatch => {
     callApi('classement/create', 'post', data).then(body => {
-        console.log('classement:', body)
       return dispatch({
         type: 'http/getClassement',
         data: body,
@@ -37,8 +36,7 @@ export function createClassement (data) {
 export function updateClassement (classement) {
 
   return dispatch => {
-    callApi(`/classement/update`, 'post', classement).then(body => {
-      // console.log("sons----->", id, roomId, userId, songName)
+    callApi('/classement/update', 'post', classement).then(body => {
       return dispatch({
         type: 'http/updateClassement',
         data: { body, roomId },

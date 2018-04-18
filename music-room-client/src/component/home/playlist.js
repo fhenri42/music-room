@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
+import { View, Text } from 'react-native-ui-lib'
 import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
-import { Card, Button, Switcher, TabButton } from 'nachos-ui'
+import { Card, Switcher, TabButton } from 'nachos-ui'
 import { Actions } from 'react-native-router-flux'
 import { Icon } from 'react-native-elements'
 
@@ -47,7 +47,7 @@ class Playlist extends Component {
                   type='add'
                   color='#f50'
                   size={15}
-                  onPress={() => { Actions.newplaylist({typePlaylist: 'private'}) }} />
+                  onPress={() => { Actions.newplaylist({ typePlaylist: 'private' }) }} />
               </View>
               <ScrollView style={{ height: '70%', alignSelf: 'center' }}>
                 { privateArray && privateArray.length !== 0 && (
@@ -77,7 +77,7 @@ class Playlist extends Component {
                   type='add'
                   color='#f50'
                   size={15}
-                  onPress={() => { Actions.newplaylist({typePlaylist: 'public'}) }} />
+                  onPress={() => { Actions.newplaylist({ typePlaylist: 'public' }) }} />
               </View>
               <ScrollView style={{ height: '70%', alignSelf: 'center' }}>
                 { publicArray && publicArray.length !== 0 && (

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, Button, ActionBar } from 'react-native-ui-lib'
+import { ActionBar } from 'react-native-ui-lib'
 import { StyleSheet } from 'react-native'
 
 class Menu extends Component {

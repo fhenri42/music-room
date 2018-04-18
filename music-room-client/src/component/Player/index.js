@@ -1,11 +1,5 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, WebView, Dimensions } from 'react-native'
-import { Actions } from 'react-native-router-flux'
-import { Card, Input, H4, Switcher, TabButton, Button } from 'nachos-ui'
-import { connect } from 'react-redux'
-import { addSongPlaylist } from '../../actions/playlist.js'
-import request from 'superagent'
+import { View } from 'react-native-ui-lib'
 
 import { Icon } from 'react-native-elements'
 
