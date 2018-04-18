@@ -22,8 +22,9 @@ const createCode = () => {
 export default class UserController {
 
   static facebookCreate (req, res) {
-    if(req.boby && req.body.access_token) {
-      
+
+    if (req.boby !== null && req.body.access_token !== null  && req.body.access_token.toString() !== '') {
+
     FB.setAccessToken(req.body.access_token.toString())
     FB.api('me', { fields: 'id,name,email,first_name,last_name', access_token: req.body.access_token.toString() }, ((fbRes) => {
       User.findOne({ email: fbRes.email }).then(u => {
@@ -53,12 +54,16 @@ export default class UserController {
         return res.status(500).send({ message: 'Internal serveur error' })
       })
     }))
-   } else { return res.status(401).send({ message: 'Plz add a valide token' }) }
-    
+   } else {
+     console.log(' LOLLOLO ta mere la timp');
+
+     return res.status(401).send({ message: 'Plz add a valide token' }) }
+
   }
 
   static facebookLink (req, res) {
-    if(req.boby && req.body.access_token) {
+    if (req.boby !== null && req.body.access_token !== null  && req.body.access_token.toString() !== '') {
+  
     FB.setAccessToken(req.body.access_token.toString())
     FB.api('me', { fields: 'id,name,email,first_name,last_name', access_token: req.body.access_token.toString() }, ((fbRes) => {
       User.findOne({ _id: req.params.id }).then(u => {

@@ -13,7 +13,7 @@ import Toaster from '../toaster/index.js'
 import { playTrack, pause, play, checkSession, isPlayingDeezer } from '../../utils/deezerService.js'
 import { callApi } from '../../utils/callApi.js'
 
-const myTimer = null
+const interval = null
 class Playlist extends Component {
 
   state = {
@@ -21,18 +21,16 @@ class Playlist extends Component {
     info: [],
     typeOf: 'play',
     currentList: [],
-    uri: '',
     isPlaying: false,
     currentSong: '',
     duration: 0,
     next: 0,
-    interval: 0
   }
-  
+
   componentWillUnmount (){
-    clearInterval(this.state.interval)
+    clearInterval(interval)
     pause()
-    
+
   }
   componentWillMount () { this.afterSong() }
 
@@ -68,10 +66,9 @@ incrementation = () => {
 }
 
 afterSong = () => {
-  const interval = setInterval((() => {
+  interval = setInterval((() => {
     this.incrementation()
   }), 1000)
-  this.setState({interval})
 }
 
 playTrackWrapper = (id) => {
@@ -166,7 +163,7 @@ playTrackWrapper = (id) => {
     const inputStyle = { margin: 15 }
     const cardStyle = { width: 200 }
 
-    const { info, value, typeOf, currentList, uri, currentSong } = this.state
+    const { info, value, typeOf, currentList, currentSong } = this.state
     const { playlist, user } = this.props
     const index = playlist.playlists.findIndex(e => e._id === this.props.playlistId)
     const indexUser = playlist.playlists[index].users.findIndex(u => u.id === user.id)
