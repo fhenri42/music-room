@@ -15,6 +15,7 @@ import EditPlaylist from './component/home/editplaylist.js'
 import ResetPass from './component/login/resetPass'
 import ImportList from './component/home/importPlaylist.js'
 import Room from './component/home/editroom'
+import Classement from './component/home/classement'
 import NewRoom from './component/home/newRoom'
 import MapRoom from './component/mapRoom'
 
@@ -78,6 +79,11 @@ class App extends Component {
             component={MapRoom}
             hideNavBar={false}
             title='Map of rooms'
+          />
+            <Scene key='classement'
+            component={Classement}
+            hideNavBar={false}
+            title='Top music'
           />
         </Stack>
       </Router>

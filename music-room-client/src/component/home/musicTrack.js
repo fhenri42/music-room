@@ -22,6 +22,8 @@ class MusicTrack extends Component {
         }}>
         Add new trackList
         </Button>
+        <Button style={{ backgroundColor: '#23242d' }} onPress={() => {Actions.classement()}}>Music Top</Button>
+        
         <View>
           <View style={{ display: 'flex', alignItems: 'center', height: '70%' }}>
             <ListOfRoom user={this.props.user} room={this.props.room} />

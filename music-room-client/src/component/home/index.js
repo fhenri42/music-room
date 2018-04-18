@@ -6,6 +6,7 @@ import { Actions } from 'react-native-router-flux'
 import Menu from './menu.js'
 import Playlist from './playlist.js'
 import { getPlayList } from '../../actions/playlist.js'
+import { getClassement, updateClassement, createClassement } from '../../actions/classement.js'
 import { toJS } from 'immutable'
 import Settings from '../settings/index.js'
 import Toaster from '../toaster/index.js'
@@ -16,6 +17,7 @@ import { checkSession } from '../../utils/deezerService.js'
 class Home extends Component {
 
   componentWillMount () {
+    this.props.dispatch(createClassement(null))
     Expo.SecureStore.getItemAsync('token', {}).then(token => {
       return this.props.dispatch({
         type: 'client/verifeUser',
