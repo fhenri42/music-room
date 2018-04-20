@@ -33,13 +33,13 @@ export function createClassement (data) {
   }
 }
 
-export function updateClassement (classement) {
+export function updateClassement (songs) {
 
   return dispatch => {
-    callApi('/classement/update', 'post', classement).then(body => {
+    callApi('classement/update', 'post', {songs}).then(body => {
       return dispatch({
         type: 'http/updateClassement',
-        data: { body, roomId },
+        data: body,
       })
     }).catch(e => {
       return dispatch({

@@ -4,6 +4,7 @@ import { ScrollView, Platform } from 'react-native'
 import { Card, Input, H4, Switcher, TabButton, Button } from 'nachos-ui'
 import { connect } from 'react-redux'
 import { addSongRoom, updateRoom } from '../../actions/room.js'
+import { updateClassement } from '../../actions/classement.js'
 import request from 'superagent'
 import Player from '../Player/specialPlayer'
 import AddUser from './addroomuser.js'
@@ -29,12 +30,37 @@ class Room extends Component {
     next: 0,
   }
 
-  componentWillUnmount () {
+  pushToClassement = (id) => {
+    const songs = this.props.classement.songs
+    const index1 = this.props.room.rooms.findIndex(e => e._id === this.props.roomId)
+    const songRoom = this.props.room.rooms[index1].songs.findIndex(s => s.id === id)
+    const song = this.props.room.rooms[index1].songs[songRoom]
+    const idSong = songs.findIndex(s => s.id === id)
+    //pour chaque musique nous avons une liste d'user qui ont voté pour cette musique
+    //si l'user a deja vote pour cette musique alors il ne peut pas revoter, sinon on l'ajoute a la liste et +1 vote de la chanson
+    if (idSong > -1) {
+      const idUser = songs[idSong].users.findIndex(u => u === this.props.user.id)
+      if (idUser === -1) {
+        songs[idSong].users.push(this.props.user.id)
+        songs[idSong].vote = songs[idSong].vote + 1
+        this.props.dispatch(updateClassement(songs))
+      }
+    } else {
+      song.users = []
+      song.users.push(this.props.user.id)
+      song.vote = 1
+      songs.push(song)
+      this.props.dispatch(updateClassement(songs))
+    }
+
+  }
+
+  componentWillUnmount() {
     clearInterval(interval)
     pause()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { room } = this.props
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
     if (room.rooms && index !== -1 && room.rooms[index].songs && room.rooms[index].songs[0]) {
@@ -84,20 +110,20 @@ class Room extends Component {
     }), 1000)
   }
 
-playTrackWrapper = (id) => {
-  const { isPlaying } = this.state
-  if (isPlaying) {
-    playTrack(id.toString()).then(() => { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) })
-  } else {
-    playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) })
-  }
-  request.get(`https://api.deezer.com/track/${id}`)
-    .set('Accept', 'application/json')
-    .then((res) => {
-      this.setState({ duration: res.body.duration })
-    })
+  playTrackWrapper = (id) => {
+    const { isPlaying } = this.state
+    if (isPlaying) {
+      playTrack(id.toString()).then(() => { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) })
+    } else {
+      playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) })
+    }
+    request.get(`https://api.deezer.com/track/${id}`)
+      .set('Accept', 'application/json')
+      .then((res) => {
+        this.setState({ duration: res.body.duration })
+      })
 
-}
+  }
   callDezzerapi = (value) => {
     this.setState({ value })
     request.get(`https://api.deezer.com/search?q=${value}`)
@@ -182,63 +208,63 @@ playTrackWrapper = (id) => {
     }
   }
 
-changeType = () => {
-  const { room, dispatch, user } = this.props
-  const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
-  const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
+  changeType = () => {
+    const { room, dispatch, user } = this.props
+    const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
+    const indexUser = room.rooms[index1].users.findIndex(u => u.id === user.id)
 
-  if (indexUser === 0) {
+    if (indexUser === 0) {
 
-    room.rooms[index1].type = room.rooms[index1].type === 'private' ? 'public' : 'private'
-    dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
-  } else {
-    this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
-  }
-}
-
-getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
-  const R = 6371 // Radius of the earth in km
-  const dLat = deg2rad(lat2 - lat1) // deg2rad below
-  const dLon = deg2rad(lon2 - lon1)
-  const a
-    = (Math.sin(dLat / 2) * Math.sin(dLat / 2))
-    + ((Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)))
-    * (Math.sin(dLon / 2) * Math.sin(dLon / 2)))
-
-  const c = 2 * (Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
-  const d = R * c // Distance in km
-  return d
-}
-
-deg2rad = (deg) => {
-  return deg * (Math.PI / 180)
-}
-
-distanceOfCenter = async (vote, songId) => {
-  const { room, dispatch, user } = this.props
-  const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
-  const center = room.rooms[index1].location.center
-  const distance = room.rooms[index1].location.distance
-  const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
-
-  if (indexUser === 0) {
-    const { status } = await Permissions.askAsync(Permissions.LOCATION)
-    if (status !== 'granted') {
-      this.props.notife.message = 'Permission to access location was denied'
+      room.rooms[index1].type = room.rooms[index1].type === 'private' ? 'public' : 'private'
+      dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
+    } else {
+      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
     }
-
-    const position = await Location.getCurrentPositionAsync({})
-
-    if (this.getDistanceFromLatLonInKm(center.lat, center.long, position.coords.latitude, position.coords.longitude) <= distance) {
-      const songs = room.rooms[index1].songs
-      const index = songs.findIndex(e => e.id === songId)
-      songs[index].vote += ((vote > 0) ? -1 : 1)
-      dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
-    }
-  } else {
-    this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
   }
-}
+
+  getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+    const R = 6371 // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1) // deg2rad below
+    const dLon = deg2rad(lon2 - lon1)
+    const a
+      = (Math.sin(dLat / 2) * Math.sin(dLat / 2))
+      + ((Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)))
+        * (Math.sin(dLon / 2) * Math.sin(dLon / 2)))
+
+    const c = 2 * (Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
+    const d = R * c // Distance in km
+    return d
+  }
+
+  deg2rad = (deg) => {
+    return deg * (Math.PI / 180)
+  }
+
+  distanceOfCenter = async (vote, songId) => {
+    const { room, dispatch, user } = this.props
+    const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
+    const center = room.rooms[index1].location.center
+    const distance = room.rooms[index1].location.distance
+    const indexUser = room.rooms[index].users.findIndex(u => u.id === user.id)
+
+    if (indexUser === 0) {
+      const { status } = await Permissions.askAsync(Permissions.LOCATION)
+      if (status !== 'granted') {
+        this.props.notife.message = 'Permission to access location was denied'
+      }
+
+      const position = await Location.getCurrentPositionAsync({})
+
+      if (this.getDistanceFromLatLonInKm(center.lat, center.long, position.coords.latitude, position.coords.longitude) <= distance) {
+        const songs = room.rooms[index1].songs
+        const index = songs.findIndex(e => e.id === songId)
+        songs[index].vote += ((vote > 0) ? -1 : 1)
+        dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
+      }
+    } else {
+      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
+    }
+  }
   updateVote = (vote, songId) => {
     const { room, dispatch, user } = this.props
     const index1 = room.rooms.findIndex(e => e._id === this.props.roomId)
@@ -250,7 +276,7 @@ distanceOfCenter = async (vote, songId) => {
     dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
   }
 
-  render () {
+  render() {
     const inputStyle = { margin: 15 }
     const cardStyle = { width: 200 }
 
@@ -266,14 +292,14 @@ distanceOfCenter = async (vote, songId) => {
             onChange={valueOne => { this.setState({ typeOf: valueOne }) }}
             defaultSelected={typeOf}
           >
-            <TabButton value='play' text='Play' iconName='md-musical-notes'/>
+            <TabButton value='play' text='Play' iconName='md-musical-notes' />
             <TabButton value='add' text='add Song' iconName='md-add' />
             <TabButton value='addUser' text='add an user' iconName='md-person-add' />
           </Switcher>)}
         {typeOf === 'play' && (
           <View style={{ flex: 1 }}>
             <ScrollView style={{ height: '60%' }}>
-              { !!room && !!room.rooms && room.rooms[index].songs !== 0 && (
+              {!!room && !!room.rooms && room.rooms[index].songs !== 0 && (
                 room.rooms[index].songs.map((s, key) => {
                   const color = 'black'
                   return (
@@ -297,6 +323,13 @@ distanceOfCenter = async (vote, songId) => {
                           onPress={() => { if (key < room.rooms[index].songs.length - 1) { this.updateVote(-1, s.id) } }} />
                       )}
                       <H4 >Vote {-s.vote}</H4>
+                      <Icon
+                        raised
+                        name='star'
+                        type='star'
+                        color='#23242d'
+                        size={15}
+                        onPress={() => { this.pushToClassement(s.id) }} />
                       <Button style={{ backgroundColor: color }} kind='squared' iconName='md-musical-notes' onPress={() => { this.playTrackWrapper(s.id) }}>{s.name}</Button>
                     </View>)
                 })
@@ -341,8 +374,8 @@ distanceOfCenter = async (vote, songId) => {
           </View>
         )}
 
-        {typeOf === 'addUser' && superU === true && (<AddUser plId={this.props.roomId} userId={user.id} users={ room.rooms[index].users} />)}
-        { typeOf === 'addUser' && superU !== true && (<Text style={{ textAlign: 'center' }}>your not allowed to add users</Text>)}
+        {typeOf === 'addUser' && superU === true && (<AddUser plId={this.props.roomId} userId={user.id} users={room.rooms[index].users} />)}
+        {typeOf === 'addUser' && superU !== true && (<Text style={{ textAlign: 'center' }}>your not allowed to add users</Text>)}
 
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
 
@@ -357,6 +390,7 @@ const mapStateToProps = state => {
     room: state.room.toJS(),
     user: state.user.toJS(),
     notife: state.notife.toJS(),
+    classement: state.classement.toJS()
   }
 }
 
