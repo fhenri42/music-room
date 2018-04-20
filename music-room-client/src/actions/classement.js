@@ -36,7 +36,7 @@ export function createClassement (data) {
 export function updateClassement (songs) {
 
   return dispatch => {
-    callApi('classement/update', 'post', {songs}).then(body => {
+    callApi('classement/update', 'post', { songs }).then(body => {
       return dispatch({
         type: 'http/updateClassement',
         data: body,

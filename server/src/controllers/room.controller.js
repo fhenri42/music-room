@@ -2,7 +2,6 @@ import filter from 'filter-object'
 import Room from '../models/room.model'
 import User from '../models/user.model'
 import _ from 'lodash'
-import request from 'superagent'
 
 const createParams = '{name,description,location,type,users,songs}'
 const updateParamsPublic = '{songs,users,description,location,type}'
@@ -13,9 +12,9 @@ function getDistanceFromLatLonInKm (lat1, lon1, lat2, lon2) {
   const dLat = deg2rad(lat2 - lat1) // deg2rad below
   const dLon = deg2rad(lon2 - lon1)
   const a
-    = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-    + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
-    * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    = (((Math.sin(dLat / 2) * Math.sin(dLat / 2))
+    + (Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))))
+    * (Math.sin(dLon / 2) * Math.sin(dLon / 2)))
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   const d = R * c // Distance in km
@@ -157,7 +156,6 @@ export default class RoomController {
     const params = filter(req.body, updateParamsPublic)
 
     Room.findOne({ _id: req.params.roomId }).then(room => {
-      console.log('room =>', room)
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
       Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: params }, { new: true }).then(room => {
         room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
@@ -172,8 +170,6 @@ export default class RoomController {
   static addMusicToList (req, res) {
 
     Room.findOne({ _id: req.params.roomId }).then(room => {
-      console.log('room =>', room)
-      
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
       const songs = room.songs
       songs.push({ id: req.params.newId, grade: songs.length - 1, name: req.params.songName, vote: 0 })

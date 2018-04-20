@@ -36,13 +36,13 @@ class Room extends Component {
     const songRoom = this.props.room.rooms[index1].songs.findIndex(s => s.id === id)
     const song = this.props.room.rooms[index1].songs[songRoom]
     const idSong = songs.findIndex(s => s.id === id)
-    //pour chaque musique nous avons une liste d'user qui ont voté pour cette musique
-    //si l'user a deja vote pour cette musique alors il ne peut pas revoter, sinon on l'ajoute a la liste et +1 vote de la chanson
+    // pour chaque musique nous avons une liste d'user qui ont voté pour cette musique
+    // si l'user a deja vote pour cette musique alors il ne peut pas revoter, sinon on l'ajoute a la liste et +1 vote de la chanson
     if (idSong > -1) {
       const idUser = songs[idSong].users.findIndex(u => u === this.props.user.id)
       if (idUser === -1) {
         songs[idSong].users.push(this.props.user.id)
-        songs[idSong].vote = songs[idSong].vote + 1
+        songs[idSong].vote++
         this.props.dispatch(updateClassement(songs))
       }
     } else {
@@ -55,12 +55,12 @@ class Room extends Component {
 
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     clearInterval(interval)
     pause()
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { room } = this.props
     const index = room.rooms.findIndex(e => e._id === this.props.roomId)
     if (room.rooms && index !== -1 && room.rooms[index].songs && room.rooms[index].songs[0]) {
@@ -68,7 +68,7 @@ class Room extends Component {
     }
     this.afterSong()
     if (Platform.OS === 'android' && !Constants.isDevice) {
-      this.props.notife.message = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!'
+      this.props.dispatch({ type: 'client/addNotife', message: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!' })
     }
   }
 
@@ -180,7 +180,9 @@ class Room extends Component {
       if (room.rooms[index1].location.active === 1) {
         const { status } = await Permissions.askAsync(Permissions.LOCATION)
         if (status !== 'granted') {
-          this.props.notife.message = 'Permission to access location was denied'
+
+          this.props.dispatch({ type: 'client/addNotife', message: 'Permission to access location was denied' })
+
         }
         const position = await Location.getCurrentPositionAsync({})
         room.rooms[index1].location.center = { lat: position.coords.latitude, long: position.coords.longitude }
@@ -190,7 +192,9 @@ class Room extends Component {
       }
 
     } else {
-      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
+
+      this.props.dispatch({ type: 'client/addNotife', message: 'you\'re not the creator of this room so you cannot make this action.' })
+
     }
   }
 
@@ -204,7 +208,9 @@ class Room extends Component {
       room.rooms[index1].location.distance = distance
       dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
     } else {
-      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
+
+      this.props.dispatch({ type: 'client/addNotife', message: 'you\'re not the creator of this room so you cannot make this action.' })
+
     }
   }
 
@@ -218,7 +224,9 @@ class Room extends Component {
       room.rooms[index1].type = room.rooms[index1].type === 'private' ? 'public' : 'private'
       dispatch(updateRoom(room.rooms[index1], room.rooms[index1]._id, user.id))
     } else {
-      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
+
+      this.props.dispatch({ type: 'client/addNotife', message: 'you\'re not the creator of this room so you cannot make this action.' })
+
     }
   }
 
@@ -250,7 +258,9 @@ class Room extends Component {
     if (indexUser === 0) {
       const { status } = await Permissions.askAsync(Permissions.LOCATION)
       if (status !== 'granted') {
-        this.props.notife.message = 'Permission to access location was denied'
+
+        this.props.dispatch({ type: 'client/addNotife', message: 'Permission to access location was denied' })
+
       }
 
       const position = await Location.getCurrentPositionAsync({})
@@ -262,7 +272,9 @@ class Room extends Component {
         dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
       }
     } else {
-      this.props.notife.message = 'you\'re not the creator of this room so you cannot make this action.'
+
+      this.props.dispatch({ type: 'client/addNotife', message: 'you\'re not the creator of this room so you cannot make this action.' })
+
     }
   }
   updateVote = (vote, songId) => {
@@ -276,7 +288,7 @@ class Room extends Component {
     dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
   }
 
-  render() {
+  render () {
     const inputStyle = { margin: 15 }
     const cardStyle = { width: 200 }
 
@@ -390,7 +402,7 @@ const mapStateToProps = state => {
     room: state.room.toJS(),
     user: state.user.toJS(),
     notife: state.notife.toJS(),
-    classement: state.classement.toJS()
+    classement: state.classement.toJS(),
   }
 }
 

@@ -1,9 +1,6 @@
-import filter from 'filter-object'
 import Classement from '../models/classement.model'
 import _ from 'lodash'
-import request from 'superagent'
 
-const updateParamsPublic = '{songs}'
 export default class ClassementController {
 
   static create (req, res) {
@@ -15,8 +12,6 @@ export default class ClassementController {
         classement1.save(err => {
           if (err) { return res.status(500).send({ message: 'internal serveur error' }) }
           return res.json({ message: 'Your classement', classement })
-        }).catch(e => {
-          console.log('e =>', e)
         })
       }
     })

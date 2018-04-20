@@ -11,6 +11,7 @@ import { Icon } from 'react-native-elements'
 import Toaster from '../toaster/index.js'
 import { playTrack, pause, play, isPlayingDeezer } from '../../utils/deezerService.js'
 import { callApi } from '../../utils/callApi.js'
+import { updateClassement } from '../../actions/classement.js'
 
 let interval = null
 class Playlist extends Component {
@@ -26,6 +27,31 @@ class Playlist extends Component {
     next: 0,
   }
 
+  pushToClassement = (id) => {
+    const songs = this.props.classement.songs
+    const index1 = this.props.playlist.playlists.findIndex(e => e._id === this.props.playlistId)
+    const songPlaylist = this.props.playlist.playlists[index1].songs.findIndex(s => s.id === id)
+    const song = this.props.playlist.playlists[index1].songs[songPlaylist]
+    const idSong = songs.findIndex(s => s.id === id)
+    // pour chaque musique nous avons une liste d'user qui ont voté pour cette musique
+    // si l'user a deja vote pour cette musique alors il ne peut pas revoter, sinon on l'ajoute a la liste et +1 vote de la chanson
+    if (idSong > -1) {
+      const idUser = songs[idSong].users.findIndex(u => u === this.props.user.id)
+      if (idUser === -1) {
+        songs[idSong].users.push(this.props.user.id)
+        songs[idSong].vote++
+        this.props.dispatch(updateClassement(songs))
+      }
+    } else {
+      song.users = []
+      song.users.push(this.props.user.id)
+      song.vote = 1
+      songs.push(song)
+      this.props.dispatch(updateClassement(songs))
+    }
+
+  }
+
   componentWillUnmount () {
     clearInterval(interval)
     pause()
@@ -33,53 +59,53 @@ class Playlist extends Component {
   }
   componentWillMount () { this.afterSong() }
 
-incrementation = () => {
+  incrementation = () => {
 
-  const { duration, next, currentSong, isPlaying } = this.state
-  isPlayingDeezer((tmpPlayer) => {
-    if (isPlaying) {
-      this.setState({ next: next + 1 })
-      if (next === duration) {
-        callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
-          const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
-          const songs = body.playLists[index1].songs
-          let index = songs.findIndex(e => e.id === currentSong)
-          index += 1
-          if (index >= songs.length) { index = 0 }
-          this.playTrackWrapper(songs[index].id)
+    const { duration, next, currentSong, isPlaying } = this.state
+    isPlayingDeezer((tmpPlayer) => {
+      if (isPlaying) {
+        this.setState({ next: next + 1 })
+        if (next === duration) {
+          callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
+            const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
+            const songs = body.playLists[index1].songs
+            let index = songs.findIndex(e => e.id === currentSong)
+            index += 1
+            if (index >= songs.length) { index = 0 }
+            this.playTrackWrapper(songs[index].id)
 
-        })
+          })
+        }
+        if ((next === 30 || next === 31) && !tmpPlayer) {
+          callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
+            const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
+            const songs = body.playLists[index1].songs
+            let index = songs.findIndex(e => e.id === currentSong)
+            index += 1
+            if (index >= songs.length) { index = 0 }
+            this.playTrackWrapper(songs[index].id)
+          })
+        }
       }
-      if ((next === 30 || next === 31) && !tmpPlayer) {
-        callApi(`playlist/all/${this.props.userId}/`, 'get').then(body => {
-          const index1 = body.playLists.findIndex(e => e._id === this.props.playlistId)
-          const songs = body.playLists[index1].songs
-          let index = songs.findIndex(e => e.id === currentSong)
-          index += 1
-          if (index >= songs.length) { index = 0 }
-          this.playTrackWrapper(songs[index].id)
-        })
-      }
-    }
-  })
-}
-
-afterSong = () => {
-  interval = setInterval((() => {
-    this.incrementation()
-  }), 1000)
-}
-
-playTrackWrapper = (id) => {
-  const { isPlaying } = this.state
-  if (isPlaying) { playTrack(id.toString()).then(() => { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) }
-
-  request.get(`https://api.deezer.com/track/${id}`)
-    .set('Accept', 'application/json')
-    .then((res) => {
-      this.setState({ duration: res.body.duration })
     })
-}
+  }
+
+  afterSong = () => {
+    interval = setInterval((() => {
+      this.incrementation()
+    }), 1000)
+  }
+
+  playTrackWrapper = (id) => {
+    const { isPlaying } = this.state
+    if (isPlaying) { playTrack(id.toString()).then(() => { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) }) } else { playTrack(id.toString()).then(() => { this.setState({ isPlaying: true, currentSong: id }) }) }
+
+    request.get(`https://api.deezer.com/track/${id}`)
+      .set('Accept', 'application/json')
+      .then((res) => {
+        this.setState({ duration: res.body.duration })
+      })
+  }
 
   callDezzerapi = (value) => {
     this.setState({ value })
@@ -170,23 +196,23 @@ playTrackWrapper = (id) => {
 
     return (
       <View style={{ flex: 1 }}>
-        { index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
+        {index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
           <Switcher
             onChange={valueOne => { this.setState({ typeOf: valueOne }) }}
             defaultSelected={typeOf}
           >
-            <TabButton value='play' text='Play' iconName='md-musical-notes'/>
+            <TabButton value='play' text='Play' iconName='md-musical-notes' />
             <TabButton value='add' text='add Song' iconName='md-add' />
             <TabButton value='addUser' text='add an user' iconName='md-person-add' />
           </Switcher>)}
         {typeOf === 'play' && (
           <View style={{ flex: 1 }}>
             <ScrollView style={{ height: '60%' }}>
-              { !!playlist && !!playlist.playlists && playlist.playlists[index].songs !== 0 && (
+              {!!playlist && !!playlist.playlists && playlist.playlists[index].songs !== 0 && (
                 playlist.playlists[index].songs.map((s, key) => {
                   return (
                     <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                      { index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
+                      {index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
                         <Icon
                           raised
                           name='keyboard-arrow-up'
@@ -195,7 +221,7 @@ playTrackWrapper = (id) => {
                           size={15}
                           onPress={() => { if (key !== 0) { this.updateGrade(1, s.id) } }} />
                       )}
-                      { index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
+                      {index !== -1 && indexUser !== -1 && playlist.playlists !== null && playlist.playlists[index].users !== null && playlist.playlists[index].users[indexUser].role === 'RW' && (
                         <Icon
                           raised
                           name='keyboard-arrow-down'
@@ -204,6 +230,13 @@ playTrackWrapper = (id) => {
                           size={15}
                           onPress={() => { if (key < playlist.playlists[index].songs.length - 1) { this.updateGrade(-1, s.id) } }} />
                       )}
+                      <Icon
+                        raised
+                        name='star'
+                        type='star'
+                        color='#23242d'
+                        size={15}
+                        onPress={() => { this.pushToClassement(s.id) }} />
                       <Button kind='squared' iconName='md-musical-notes' onPress={() => { this.playTrackWrapper(s.id) }}>{s.name}</Button>
                     </View>)
                 })
@@ -248,8 +281,8 @@ playTrackWrapper = (id) => {
           </View>
         )}
 
-        { typeOf === 'addUser' && superU === true && (<AddUser plId={this.props.playlistId} userId={user.id} users={ playlist.playlists[index].users} />)}
-        { typeOf === 'addUser' && superU !== true && (<Text style={{ textAlign: 'center' }}>your not allowed to add users</Text>)}
+        {typeOf === 'addUser' && superU === true && (<AddUser plId={this.props.playlistId} userId={user.id} users={playlist.playlists[index].users} />)}
+        {typeOf === 'addUser' && superU !== true && (<Text style={{ textAlign: 'center' }}>your not allowed to add users</Text>)}
 
         {this.props.notife.message !== '' && (<Toaster msg={this.props.notife.message} />)}
 
@@ -264,6 +297,7 @@ const mapStateToProps = state => {
     playlist: state.playlist.toJS(),
     user: state.user.toJS(),
     notife: state.notife.toJS(),
+    classement: state.classement.toJS(),
   }
 }
 
