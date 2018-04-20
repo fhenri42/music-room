@@ -27,7 +27,8 @@
       "max-statements-per-line": 0,
       "react/jsx-uses-vars": 2,
       "no-class-assign": 0,
-      "no-unused-vars": 0
+      "no-unused-vars": 0,
+      "no-unused-expressions": 0
     }
   },
   "jest": {

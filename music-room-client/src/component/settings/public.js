@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { Input, Button, RadioGroup } from 'nachos-ui'
 import { updateUser } from '../../actions/user.js'
 import { TagsInput } from 'react-native-ui-lib'
+import { Actions } from 'react-native-router-flux'
 
 class publicUpdate extends Component {
 
@@ -74,6 +75,8 @@ state = {
           component={this.renderRadioGroup}
         />
         <Button kind='squared' onPress={handleSubmit(this.onSubmit)}>Update</Button>
+
+        <Button kind='squared' style={{ marginTop: 5 }} onPress={() => { Actions.friend() }}>Friends</Button>
 
       </View>
     )

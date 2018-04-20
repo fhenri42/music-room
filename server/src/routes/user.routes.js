@@ -156,4 +156,18 @@ export default [
     handler: UserController.facebookLink,
     validator: [],
   },
+  {
+    method: 'PUT',
+    path: '/user/addFriend/:email/:userId',
+    handler: UserController.addFriend,
+    validator: [],
+  },
+
+  {
+    method: 'PUT',
+    path: '/user/deleteFriend/:email/:userId',
+    handler: UserController.deleteFriend,
+    validator: [],
+  },
+
 ]

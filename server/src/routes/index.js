@@ -8,7 +8,7 @@ export const routes = [
   ...userRoutes,
   ...playlistRoute,
   ...roomRoute,
-  ...classementRoute
+  ...classementRoute,
 ]
 
 export const createRouter = app => {

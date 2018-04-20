@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
 
 db.once('open', () => {
   createRouter(app)
-  //okok()
+  // okok()
   server.listen(config.local.port, () => {
     if (process.env.NODE_ENV === 'development') { console.log(`App is running and listening to port ${config.local.port}`) }
   })

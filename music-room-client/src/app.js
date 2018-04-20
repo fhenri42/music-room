@@ -14,7 +14,8 @@ import Room from './component/home/editroom'
 import Classement from './component/home/classement'
 import NewRoom from './component/home/newRoom'
 import MapRoom from './component/mapRoom'
-
+import Friend from './component/settings/friend'
+import ShowProfile from './component/settings/showProfile'
 class App extends Component {
   render () {
     return (
@@ -80,6 +81,16 @@ class App extends Component {
             component={Classement}
             hideNavBar={false}
             title='Top music'
+          />
+          <Scene key='friend'
+            component={Friend}
+            hideNavBar={false}
+            title='Friends'
+          />
+          <Scene key='showProfile'
+            component={ShowProfile}
+            hideNavBar={false}
+            title='Your friend'
           />
         </Stack>
       </Router>

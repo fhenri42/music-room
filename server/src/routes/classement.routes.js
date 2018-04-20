@@ -73,6 +73,6 @@ export default [
     path: '/classement/update',
     handler: ClassementController.update,
     validator: [isLogin],
-  }
+  },
 ]
 

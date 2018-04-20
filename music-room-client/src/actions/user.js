@@ -138,3 +138,35 @@ export function verifyNewPassword (email, newPassword, code) {
     })
   }
 }
+
+export function addFriend (email, userId) {
+  return dispatch => {
+    callApi(`user/addFriend/${email}/${userId}`, 'put').then(body => {
+      return dispatch({
+        type: 'http/login',
+        data: body,
+      })
+    }).catch(e => {
+      return dispatch({
+        type: 'client/addNotife',
+        data: e,
+      })
+    })
+  }
+}
+
+export function deleteFriend (email, userId) {
+  return dispatch => {
+    callApi(`user/deleteFriend/${email}/${userId}`, 'put').then(body => {
+      return dispatch({
+        type: 'http/login',
+        data: body,
+      })
+    }).catch(e => {
+      return dispatch({
+        type: 'client/addNotife',
+        data: e,
+      })
+    })
+  }
+}
