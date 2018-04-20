@@ -29,17 +29,16 @@ export default [
     validator: [],
   },
   /**
-  * @api {Get} /user/:email get a user
+  * @api {Get} /user/:email Get a user
   * @apiName UserController
   * @apiGroup getMe
   *
-  * @apiDescription get the information of a user
+  * @apiDescription Get the information of a user
   *
   * @apiHeader {X-PASS} password password
   * @apiParam {String} email  email
   *
   * @apiSuccess {String} tokenJWT User information
-  * @apiSuccess {String} message success message
   *
   * @apiError (Bad Request 404 email is invalid) {String} message Return if email is not found
   * @apiError (Bad Request 403 password is invalid) {String} message Return if password does not match
@@ -54,20 +53,19 @@ export default [
   },
 
   /**
-  * @api {Post} /user/update/:id  update a user
+  * @api {Post} /user/update/:id  Update a user
   * @apiName UserController
   * @apiGroup updatePublic
   *
-  * @apiDescription update the information of a user
+  * @apiDescription Update the information of a user
   *
-  * @apiParam {String} email  email
   * @apiParam {String} firstName  firstName
   * @apiParam {String} lastName  lastName
-  * @apiParam {String} bio  bio
-  * @apiParam {String} url  url
+  * @apiParam {String} tags  tags
+  * @apiParam {String} musicTags  musicTags
+  * @apiParam {String} isPrivateInfo  isPrivateInfo
   *
   * @apiSuccess {String} tokenJWT User information
-  * @apiSuccess {String} message success message
   *
   * @apiError (Bad Request 401 email is invalid) {String} message Return if this email is already use
   * @apiError (Bad Request 404 password is invalid) {String} message Return if we did not find any User
@@ -82,22 +80,20 @@ export default [
   },
 
   /**
-  * @api {Post} /user/update/privatePassword/:id  update a user
+  * @api {Post} /user/update/privatePassword/:id  Update a user
   * @apiName UserController
-  * @apiGroup updatePrivatePassword
+  * @apiGroup updatePrivate
   *
-  * @apiDescription update the information private of a user
+  * @apiDescription Update the information private of a user
   *
-  * @apiParam {String} password  password
+  * @apiParam {String} email  email
   * @apiParam {String} newPassword  newPassword
 
   *
   * @apiSuccess {String} tokenJWT User information
   * @apiSuccess {String} message success message
   *
-  * @apiError (Bad Request 401 email is invalid) {String} message Return if this email is already use
-  * @apiError (Bad Request 403 password is invalid) {String} message Return if the password is wrong password
-  * @apiError (Bad Request 404 password is invalid) {String} message Return if we did not find any User
+  * @apiError (Bad Request 401 email is invalid) {String} message Return if this email is already used
   */
   {
     method: 'POST',
@@ -107,14 +103,14 @@ export default [
   },
 
   /**
-  * @api {Post} /user/verifyEmail verified a email of a user
+  * @api {Put} /user/verifyEmail Verified a email of a user
   * @apiName UserController
   * @apiGroup verifyEmail
   *
-  * @apiDescription verifie a email of a user
+  * @apiDescription Verifie a email of a user
   *
   * @apiParam {String} email  email
-  * @apiParam {String} token  token
+  * @apiParam {String} code  code
 
   *
   * @apiSuccess {String} tokenJWT User information
@@ -129,12 +125,45 @@ export default [
     validator: [],
   },
 
+  /**
+  * @api {Get} /user/resetPassword Reset password of a user
+  * @apiName UserController
+  * @apiGroup resetPassword
+  *
+  * @apiDescription Reset password of a user
+  *
+  * @apiParam {String} email  email
+
+  *
+  * @apiSuccess {String} message success message
+  *
+  * @apiError (Bad Request 404 account is invalid) {String} message Return No account whit this email
+  */
+
   {
     method: 'GET',
     path: '/user/resetPassword/:email',
     handler: UserController.resetPassword,
     validator: [],
   },
+
+  /**
+  * @api {Put} /user/resetVerefiPassword Reset password of a verify user
+  * @apiName UserController
+  * @apiGroup resetVerefiPassword
+  *
+  * @apiDescription Reset password of a verify user
+  *
+  * @apiParam {String} email  email
+  * @apiParam {String} code  code
+  * @apiParam {String} newPassword  newPassword
+
+  *
+  * @apiSuccess {String} tokenJWT User information
+  * @apiSuccess {String} message success message
+  *
+  * @apiError (Bad Request 403 account is invalid) {String} message Return This is not a valid account, or was previously update
+  */
 
   {
     method: 'PUT',
@@ -143,12 +172,42 @@ export default [
     validator: [],
   },
 
+  /**
+  * @api {Post} /user/facebookCreate Create facebook account
+  * @apiName UserController
+  * @apiGroup facebookCreate
+  *
+  * @apiDescription Create facebook account
+  *
+  * @apiParam {String} access_token  access_token
+
+  *
+  * @apiSuccess {String} tokenJWT User information
+  *
+  * @apiError (Bad Request 403 invalid Facebook) {String} message Return What the fuck are you doing ?
+  */
+
   {
     method: 'POST',
     path: '/user/create/facebook',
     handler: UserController.facebookCreate,
     validator: [],
   },
+
+  /**
+  * @api {Post} /user/facebookLink Link facebook in account
+  * @apiName UserController
+  * @apiGroup facebookLink
+  *
+  * @apiDescription Link facebook in account
+  *
+  * @apiParam {String} access_token  access_token
+
+  *
+  * @apiSuccess {String} tokenJWT User information
+  *
+  * @apiError (Bad Request 403 invalid Facebook) {String} message Return What the fuck are you doing ?
+  */
 
   {
     method: 'POST',

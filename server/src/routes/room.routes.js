@@ -16,7 +16,7 @@ export default [
   * @apiParam {Array} users  users
   * @apiParam {Array} songs  songs
   *
-  * @apiSuccess {Object} Playlist information
+  * @apiSuccess {Object} Room information
   * @apiSuccess {String} message success message
   *
   * @apiError (Bad Request 400 email is invalid) {String} message Return if name is already in use
@@ -31,18 +31,19 @@ export default [
   },
 
   /**
-  * @api {Get} /room/all/:userId get a room
+  * @api {Get} /room/all/:userId Get a room
   * @apiName RoomController
-  * @apiGroup getPlaylistByName
+  * @apiGroup getRoomAll
   *
-  * @apiDescription get all the room
+  * @apiDescription Get all the room
   *
-  * @apiParam {String} userId  userId
+  * @apiParam {ObjectId} userId  userId
+  * @apiParam {Number} long  long
+  * @apiParam {Number} lat  lat
   *
-  * @apiSuccess {Object} Playlist information
+  * @apiSuccess {Object} Room information
   * @apiSuccess {String} message success message
   *
-  * @apiError (Bad Request 403 userId is invalid) {String} message Return if user are not allowed to access this room
   *
   */
 
@@ -54,16 +55,16 @@ export default [
   },
 
   /**
-  * @api {Get} /room/:name/:userId get a room
+  * @api {Get} /room/:name/:userId Get a room
   * @apiName RoomController
-  * @apiGroup getPlaylistByName
+  * @apiGroup getRoomByName
   *
-  * @apiDescription get a room by name
+  * @apiDescription Get a room by name
   *
   * @apiParam {String} name  name
-  * @apiParam {String} userId  userId
+  * @apiParam {ObjectId} userId  userId
   *
-  * @apiSuccess {Object} Playlist information
+  * @apiSuccess {Object} Room information
   * @apiSuccess {String} message success message
   *
   * @apiError (Bad Request 403 userId is invalid) {String} message Return if user are not allowed to access this room
@@ -78,21 +79,18 @@ export default [
   },
 
   /**
-  * @api {Post} /room/update/:name/:userId  update a user
+  * @api {Post} /room/update/:name/:userId  Update a public user
   * @apiName RoomController
-  * @apiGroup updatePublic
+  * @apiGroup UpdatePublic
   *
   * @apiDescription update the information of a room
   *
-  * @apiParam {String} description  description
-  * @apiParam {String} type  type
-  * @apiParam {String} users  users
-  * @apiParam {String} songs  songs
+  * @apiParam {ObjectId} roomId  roomId
   *
-  * @apiSuccess {Object} Playlist information
+  * @apiSuccess {Object} Room information
   * @apiSuccess {String} message success message
   *
-  * @apiError (Bad Request 403 userId is invalid) {String} message Return if user are not allowed to access this room
+  * @apiError (Bad Request 404 userId is invalid) {String} message Return if No room found
   *
   */
 
@@ -104,20 +102,73 @@ export default [
   },
 
   /**
-nIqUE LA DocC
-**/
+  * @api {Post} /room/update/:roomId/:userId/:newId/:songName  Update a private user
+  * @apiName RoomController
+  * @apiGroup updatePrivate
+  *
+  * @apiDescription Update the public information of a room
+  *
+  * @apiParam {ObjectId} roomId  roomId
+  * @apiParam {String} email  email
+  * @apiParam {ObjectId} userId  userId
+  * @apiParam {Number} type  type
+  *
+  * @apiSuccess {Object} Room information
+  * @apiSuccess {String} message success message
+  *
+  * @apiError (Bad Request 404 userId is invalid) {String} message Return if No room found
+  * @apiError (Bad Request 403 userId is invalid) {String} message Return if You are not allowed to access this room
+  *
+  */
+
   {
     method: 'POST',
-    path: '/room/updatePrivate/:roomId/:userId',
+    path: '/room/update/:roomId/:userId/:newId/:songName',
     handler: RoomController.updatePrivate,
     validator: [isLogin],
   },
+
+  /**
+  * @api {Put} /room/update/:roomId/:userId/:newId/:songName Add music to list
+  * @apiName RoomController
+  * @apiGroup addMusicToList
+  *
+  * @apiDescription Add music to list
+  *
+  * @apiParam {ObjectId} roomId  roomId
+  * @apiParam {ObjectId} newId  newId
+  * @apiParam {String} songName  songName
+  *
+  * @apiSuccess {Object} Room information
+  * @apiSuccess {String} message success message
+  *
+  * @apiError (Bad Request 404 userId is invalid) {String} message Return if No room found
+  *
+  */
+
   {
     method: 'PUT',
     path: '/room/update/:roomId/:userId/:newId/:songName',
     handler: RoomController.addMusicToList,
     validator: [isLogin],
   },
+
+  /**
+  * @api {Put} /room/delete/user/:roomId/:userId/:userIdToDelete Delete a user
+  * @apiName RoomController
+  * @apiGroup deleteUser
+  *
+  * @apiDescription Delete a user
+  *
+  * @apiParam {ObjectId} roomId  roomId
+  * @apiParam {ObjectId} userIdToDelete  userIdToDelete
+  *
+  * @apiSuccess {Object} Room information
+  * @apiSuccess {String} message success message
+  *
+  * @apiError (Bad Request 404 userId is invalid) {String} message Return if No room found
+  *
+  */
 
   {
     method: 'PUT',
