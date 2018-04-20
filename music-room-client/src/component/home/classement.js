@@ -4,19 +4,24 @@ import { ScrollView } from 'react-native'
 import { Button } from 'nachos-ui'
 import { connect } from 'react-redux'
 // import { getClassement, updateClassement } from '../../actions/classement.js'
+import { Icon, Text } from 'react-native-elements'
+import { updateClassement } from '../../actions/classement'
 
 class Classement extends Component {
-
-    updateVote = (vote, songId) => {
-      const songs = this.props.classement.songs
-      const index = songs.findIndex(e => e.id === songId)
-
-      const classementIndex = this.props.user.classement.songs.findIndex(e => e.id === songId)
-      if (classementIndex === -1) {
-        songs[index].vote += 1
-        dispatch(updateRoom({ songs }, room.rooms[index1]._id, user.id))
-      }
+  pushToClassement = (id) => {
+    const songs = this.props.classement.songs
+    const use = songs[id].users.findIndex(u => u === this.props.user.id)
+    //pour chaque musique nous avons une liste d'user qui ont voté pour cette musique
+    //si l'user a deja vote pour cette musique alors il ne peut pas revoter, sinon on l'ajoute a la liste et +1 vote de la chanson
+    if (use === -1) {
+      console.log(use)
+      songs[id].users.push(this.props.user.id)
+      songs[id].vote = songs[id].vote + 1
+      this.props.dispatch(updateClassement(songs))
+    }else{
+      this.props.notife.message = 'You have already voted for him.'
     }
+  }
 
     render () {
       return (
@@ -24,7 +29,7 @@ class Classement extends Component {
           <ScrollView style={{ height: '60%' }}>
             {this.props.classement.songs.map((s, key) => {
               return (
-                <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: color }}>
+                <View key={key} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                   {(
                     <Icon
                       raised
@@ -32,19 +37,10 @@ class Classement extends Component {
                       type='keyboard-arrow-up'
                       color='#f50'
                       size={15}
-                      onPress={() => { if (key !== 0) { this.updateVote(1, s.id) } }} />
+                      onPress={() => { this.pushToClassement(key) }} />
                   )}
-                  {(
-                    <Icon
-                      raised
-                      name='keyboard-arrow-down'
-                      type='keyboard-arrow-down'
-                      color='#f50'
-                      size={15}
-                      onPress={() => { if (key < this.props.classement.songs.length - 1) { this.updateVote(-1, s.id) } }} />
-                  )}
-                  <H4 >Vote {-s.vote}</H4>
-                  <Button style={{ backgroundColor: color }} kind='squared' iconName='md-musical-notes' onPress={() => { this.playTrackWrapper(s.id) }}>{s.name}</Button>
+                  <Text h5>Vote {s.vote}</Text>
+                  <Button style={{ backgroundColor: 'black' }} kind='squared' iconName='md-musical-notes'>{s.name}</Button>
                 </View>
               )
             })}
@@ -58,6 +54,7 @@ const mapStateToProps = state => {
   return {
     classement: state.classement.toJS(),
     user: state.user.toJS(),
+    notife: state.notife.toJS()    
   }
 }
 

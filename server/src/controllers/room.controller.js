@@ -157,6 +157,7 @@ export default class RoomController {
     const params = filter(req.body, updateParamsPublic)
 
     Room.findOne({ _id: req.params.roomId }).then(room => {
+      console.log('room =>', room)
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
       Room.findOneAndUpdate({ _id: req.params.roomId }, { $set: params }, { new: true }).then(room => {
         room.songs = _.sortBy(room.songs, ['vote'], ['desc'])
@@ -171,6 +172,8 @@ export default class RoomController {
   static addMusicToList (req, res) {
 
     Room.findOne({ _id: req.params.roomId }).then(room => {
+      console.log('room =>', room)
+      
       if (!room) { return res.status(404).send({ message: 'No room found' }) }
       const songs = room.songs
       songs.push({ id: req.params.newId, grade: songs.length - 1, name: req.params.songName, vote: 0 })

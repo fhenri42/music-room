@@ -10,8 +10,8 @@ export default class ClassementController {
       const classement = new Classement({
         songs: []
       })
-      Classement.find().then(classement => {
-          if (!classement[0]){
+      Classement.find().then(classements => {
+          if (!classements[0]){
             classement.save(err => {
                 if (err) { return res.status(500).send({ message: 'internal serveur error' }) }
                 return res.json({ message: 'Your classement', classement})
@@ -30,11 +30,9 @@ export default class ClassementController {
   }
 
   static update (req, res) {
-    const params = filter(req.body, updateParamsPublic)
-
-    Classement.find().then(classement => {
-      if (!classement) { return res.status(404).send({ message: 'No classement found' }) }
-      Classement.findOneAndUpdate({ _id: classement[0]._id }, { $set: params.songs }, { new: true }).then(classement => {
+    Classement.find().then(classements => {
+      if (!classements) { return res.status(404).send({ message: 'No classement found' }) }
+      Classement.findOneAndUpdate({ _id: classements[0]._id }, { songs: req.body.songs }, { new: true }).then(classement => {
         classement.songs = _.sortBy(classement.songs, ['vote'], ['desc'])
         return res.json({ message: 'Your classement', classement })
       }).catch(() => {
