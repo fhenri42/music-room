@@ -215,12 +215,43 @@ export default [
     handler: UserController.facebookLink,
     validator: [],
   },
+
+  /**
+  * @api {Put} /user/addFriend/:email/:userId Add a friend to a user
+  * @apiName UserController
+  * @apiGroup addFriend
+  *
+  * @apiDescription Add a friend to a user
+  *
+  * @apiParam {String} email  email
+  * @apiParam {String} userId userId
+  *
+  * @apiSuccess {String} tokenJWT User information
+  *
+  * @apiError (Bad Request 404 invalid Facebook) {String} message Return Did not find any user
+  */
+
   {
     method: 'PUT',
     path: '/user/addFriend/:email/:userId',
     handler: UserController.addFriend,
     validator: [],
   },
+
+  /**
+  * @api {Put} /user/deleteFriend/:email/:userId Delete a friend of a user
+  * @apiName UserController
+  * @apiGroup addFriend
+  *
+  * @apiDescription delete a friend of a user
+  *
+  * @apiParam {String} email  email
+  * @apiParam {String} userId userId
+  *
+  * @apiSuccess {String} tokenJWT User information
+  *
+  * @apiError (Bad Request 404 invalid Facebook) {String} message Return Did not find any user
+  */
 
   {
     method: 'PUT',
