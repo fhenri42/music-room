@@ -1,6 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { AuthSession } from 'expo'
+import { StyleSheet, View } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import { connectDeezer, disconnectDeezer } from '../../utils/deezerService.js'
 

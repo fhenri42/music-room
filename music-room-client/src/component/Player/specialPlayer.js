@@ -1,12 +1,6 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, WebView, Dimensions } from 'react-native'
-import { Actions } from 'react-native-router-flux'
-import { Slider, Card, Input, H4, Switcher, TabButton, Button } from 'nachos-ui'
-import { connect } from 'react-redux'
-import { addSongPlaylist } from '../../actions/playlist.js'
-import request from 'superagent'
-
+import { View } from 'react-native-ui-lib'
+import { Slider, H4 } from 'nachos-ui'
 import { Icon } from 'react-native-elements'
 
 class Player extends Component {
@@ -40,7 +34,7 @@ class Player extends Component {
         </View>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <H4>
-            { Math.round((distance * 1000))} m
+            {Math.round((distance * 1000))} m
           </H4>
         </View>
 
@@ -58,7 +52,7 @@ class Player extends Component {
           <H4
             color={active === 0 ? '#f50' : ''}
             onPress={changeLocationType} >
-                        Location: {active === 0 ? 'Not active' : 'Active'}
+            Location: {active === 0 ? 'Not active' : 'Active'}
           </H4>
           <H4
             onPress={changeType}

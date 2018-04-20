@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
-import { Field, reduxForm } from 'redux-form'
-import { connect } from 'react-redux'
-import { View, TextInput, Text, Button } from 'react-native-ui-lib'
+import { ScrollView } from 'react-native'
+import { View, Text } from 'react-native-ui-lib'
 
 import Private from './private.js'
 import Public from './public.js'

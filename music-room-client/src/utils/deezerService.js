@@ -2,7 +2,6 @@ import { NativeModules } from 'react-native'
 
 const DeezerManager = NativeModules.DeezerManager
 
-// console.log(DeezerManager);
 export function connectDeezer () {
   return new Promise((resolve, reject) => {
     DeezerManager.connect((decision) => { decision ? resolve(decision) : reject(decision) })
@@ -10,24 +9,24 @@ export function connectDeezer () {
 }
 
 export function disconnectDeezer () {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     DeezerManager.disconnect((test) => {
-      console.log(test)
+      resolve(test)
     })
   })
 }
 export function checkSession (cb) { DeezerManager.isSessionValid(cb) }
 
 export function playTrack (id) {
-  return new Promise((resolve, reject) => {
-    DeezerManager.playTrack(id).then((res, err) => {
+  return new Promise((resolve) => {
+    DeezerManager.playTrack(id).then((res) => {
       resolve(res)
     })
   })
 }
 
 export function getPlaylistTracks (id) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     DeezerManager.getPlaylistTracks(id).then(res => {
       resolve(res)
     })
@@ -35,7 +34,7 @@ export function getPlaylistTracks (id) {
 }
 
 export function getFavoritesTracks () {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     DeezerManager.getFavoritesTracks().then(res => {
       resolve(res)
     })
@@ -43,7 +42,7 @@ export function getFavoritesTracks () {
 }
 
 export function getPlaylists () {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     DeezerManager.getPlaylists().then(res => {
       resolve(res)
     })

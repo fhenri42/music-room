@@ -1,29 +1,12 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, ActionBar } from 'react-native-ui-lib'
-import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
-import { Card, Button, Switcher, TabButton } from 'nachos-ui'
+import { ScrollView } from 'react-native'
+import { Button } from 'nachos-ui'
 import { connect } from 'react-redux'
-import { addSongRoom, updateRoom, getRoom } from '../../actions/room.js'
 // import Playlist from './playlist'
 import { Actions } from 'react-native-router-flux'
-import { Constants, Location, Permissions, LinearGradient } from 'expo'
+import { Location, Permissions } from 'expo'
 
 class ListOfRoom extends Component {
-
-  getRooms = async () => {
-    const { dispatch } = this.props
-    const { status } = await Permissions.askAsync(Permissions.LOCATION)
-    if (status !== 'granted') {
-      dispatch(getRoom({ userId: this.props.user.id }))
-    } else {
-      const position = await Location.getCurrentPositionAsync({})
-      dispatch(getRoom({ userId: this.props.user.id, lat: position.coords.latitude, long: position.coords.longitude }))
-    }
-  }
-
-  componentWillMount () {
-    this.getRooms()
-  }
 
   render () {
     return (
@@ -31,15 +14,23 @@ class ListOfRoom extends Component {
         {this.props.room.rooms && this.props.room.rooms.length !== 0 && (
           this.props.room.rooms.map((p, key) => {
             return (
-              <Button key={key} onPress={() => {
-                Actions.editRoom({ roomId: p._id, userId: this.props.user.id })
-              }} style={{ margin: 15,
-                width: 280,
-                borderColor: 'orange',
-                backgroundColor: `rgb(${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)})` }}>{p.name}</Button>
+              <Button key={key} onPress={() => { Actions.editRoom({ roomId: p._id, userId: this.props.user.id }) }}
+                kind='squared'
+                style={{ margin: 15,
+                  width: 280,
+                  borderColor: 'orange',
+                  backgroundColor: 'black' }}>{p.name}</Button>
             )
           })
         )}
+        <Button kind='squared' onPress={() =>
+          Permissions.askAsync(Permissions.LOCATION).then(status => {
+            if (status.status === 'granted') {
+              Location.getCurrentPositionAsync({}).then(position => {
+                Actions.map({ room: this.props.room, lat: position.coords.latitude, long: position.coords.longitude })
+              })
+            }
+          })}> Map</Button>
       </ScrollView>
     )
 

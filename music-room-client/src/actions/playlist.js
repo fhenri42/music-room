@@ -1,6 +1,5 @@
 import { callApi } from '../utils/callApi.js'
 import { Actions } from 'react-native-router-flux'
-import { getPlaylistTracks } from '../utils/deezerService.js'
 
 export function getPlayList (userId) {
   return dispatch => {
@@ -21,7 +20,7 @@ export function createPlayList (data) {
 
   return dispatch => {
     callApi('playlist/create', 'post', data).then(body => {
-      Actions.home()
+      Actions.home({ mode: 1 })
       return dispatch({
         type: 'http/newPlayList',
         data: body,

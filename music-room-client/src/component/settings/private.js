@@ -1,21 +1,17 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, TouchableOpacity, View } from 'react-native'
+import { View } from 'react-native'
 import { Field, reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
-import { Actions } from 'react-native-router-flux'
-import { Card, Input, H4, Switcher, TabButton, Button, RadioGroup } from 'nachos-ui'
+import { Input, Button, RadioGroup } from 'nachos-ui'
 
-import { updateUserPrivate } from '../../actions/user.js'
-import { facebookLinkAction } from '../../actions/user.js'
+import { updateUserPrivate, facebookLinkAction } from '../../actions/user.js'
 import { AuthSession } from 'expo'
-
-import Toaster from '../toaster/index.js'
 
 const FB_APP_ID = '658620540953187'
 
 class Singup extends Component {
 
-  renderTextField = ({ input, label, meta: { touched, error }, ...custom, secureTextEntry }) => (
+  renderTextField = ({ input, label, ...custom }) => (
 
     <Input
       style={{ margin: 15 }}
@@ -24,7 +20,7 @@ class Singup extends Component {
       {...custom}
     />)
 
-  renderRadioGroup = ({ input, label, meta: { touched, error }, ...custom }) => (
+  renderRadioGroup = () => (
     <RadioGroup
       style={{ margin: 15 }}
       onChange= {(a, b) => { input.onChange(a, b) }}
@@ -49,7 +45,6 @@ class Singup extends Component {
 
     const { handleSubmit, initialValues, user } = this.props
 
-    console.log(user)
     return (
       <View style={{ flex: 1, width: '90%', alignSelf: 'center' }}>
         <Field
@@ -74,7 +69,7 @@ class Singup extends Component {
   }
 }
 
-const validate = values => {
+const validate = () => {
   const errors = {}
 
   return errors

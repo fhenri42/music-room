@@ -15,6 +15,7 @@ const configureStore = (reducer) => createStore(
     user: reducer.user,
     playlist: reducer.playlist,
     room: reducer.room,
+    classement: reducer.classement,
     notife: reducer.notife,
     form: formReducer,
   }),

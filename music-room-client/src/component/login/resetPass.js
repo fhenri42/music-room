@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, TouchableOpacity, View } from 'react-native'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import { resetPass, verifyNewPassword } from '../../actions/user.js'

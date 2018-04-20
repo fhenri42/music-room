@@ -23,64 +23,71 @@ export default class UserController {
 
   static facebookCreate (req, res) {
 
-    FB.setAccessToken(req.body.access_token.toString())
-    FB.api('me', { fields: 'id,name,email,first_name,last_name', access_token: req.body.access_token.toString() }, ((fbRes) => {
-      User.findOne({ email: fbRes.email }).then(u => {
-        if (u) {
-          if (u.isFaceBookLogin === true) {
-            const token = generateToken(u)
+    if (req.boby !== null && req.body.access_token !== null && req.body.access_token.toString() !== '') {
+
+      FB.setAccessToken(req.body.access_token.toString())
+      FB.api('me', { fields: 'id,name,email,first_name,last_name', access_token: req.body.access_token.toString() }, ((fbRes) => {
+        User.findOne({ email: fbRes.email }).then(u => {
+          if (u) {
+            if (u.isFaceBookLogin === true) {
+              const token = generateToken(u)
+              return res.json({ token })
+            } return res.status(403).send({ message: 'What the fuck are you doing ?' })
+          }
+          const user = new User({
+            email: fbRes.email,
+            isActive: true,
+            url: fbRes.url,
+            firstName: fbRes.first_name,
+            lastName: fbRes.last_name,
+            isEmailVerified: true,
+            isFaceBookLogin: true,
+          })
+
+          user.save(err => {
+            if (err) { return res.status(500).send({ message: 'internal serveur error' }) }
+            const token = generateToken(user)
             return res.json({ token })
-          } return res.status(403).send({ message: 'What the fuck are you doing ?' })
-        }
-        const user = new User({
-          email: fbRes.email,
-          isActive: true,
-          url: fbRes.url,
-          firstName: fbRes.first_name,
-          lastName: fbRes.last_name,
-          isEmailVerified: true,
-          isFaceBookLogin: true,
-        })
+          })
 
-        user.save(err => {
-          if (err) { return res.status(500).send({ message: 'internal serveur error' }) }
-          const token = generateToken(user)
-          return res.json({ token })
+        }).catch(() => {
+          return res.status(500).send({ message: 'Internal serveur error' })
         })
+      }))
+    } else {
 
-      }).catch(() => {
-        return res.status(500).send({ message: 'Internal serveur error' })
-      })
-    }))
+      return res.status(401).send({ message: 'Plz add a valide token' })
+    }
 
   }
 
   static facebookLink (req, res) {
+    if (req.boby !== null && req.body.access_token !== null && req.body.access_token.toString() !== '') {
 
-    FB.setAccessToken(req.body.access_token.toString())
-    FB.api('me', { fields: 'id,name,email,first_name,last_name', access_token: req.body.access_token.toString() }, ((fbRes) => {
-      User.findOne({ _id: req.params.id }).then(u => {
-        if (u) {
-          const toSave = {
-            url: fbRes.url,
-            firstName: fbRes.first_name,
-            lastName: fbRes.last_name,
-            isFaceBookLogin: true,
+      FB.setAccessToken(req.body.access_token.toString())
+      FB.api('me', { fields: 'id,name,email,first_name,last_name', access_token: req.body.access_token.toString() }, ((fbRes) => {
+        User.findOne({ _id: req.params.id }).then(u => {
+          if (u) {
+            const toSave = {
+              url: fbRes.url,
+              firstName: fbRes.first_name,
+              lastName: fbRes.last_name,
+              isFaceBookLogin: true,
+            }
+            User.findOneAndUpdate({ _id: req.params.id }, { $set: toSave }, { new: true }).then(user => {
+              const token = generateToken(user)
+              return res.json({ token }) /* istanbul ignore next */
+            })
+          } else {
+            return res.status(403).send({ message: 'What the fuck are you doing ?' })
+
           }
-          User.findOneAndUpdate({ _id: req.params.id }, { $set: toSave }, { new: true }).then(user => {
-            const token = generateToken(user)
-            return res.json({ token }) /* istanbul ignore next */
-          })
-        } else {
-          return res.status(403).send({ message: 'What the fuck are you doing ?' })
 
-        }
-
-      }).catch(() => {
-        return res.status(500).send({ message: 'Internal serveur error' })
-      })
-    }))
-
+        }).catch(() => {
+          return res.status(500).send({ message: 'Internal serveur error' })
+        })
+      }))
+    } else { return res.status(401).send({ message: 'Plz add a valide token' }) }
   }
 
   static create (req, res) {
@@ -242,6 +249,51 @@ export default class UserController {
           })
         }
       }).catch(() => { return res.status(500).send({ message: 'Internal serveur error' }) })
+  }
+
+  static addFriend (req, res) {
+    User.findOne({ _id: req.params.userId }).then(u => {
+      if (!u) { return res.status(404).send({ message: 'We did not find any User' }) }
+
+      User.findOne({ email: req.params.email }).then(is => {
+        if (!is) { return res.status(404).send({ message: 'We did not find any User' }) }
+        const index = u.friends.findIndex(e => e === req.params.email)
+        if (index !== -1) { return res.status(401).send({ message: 'You can add 2 time the same user' }) }
+        const params = { friends: u.friends || [] }
+        params.friends.push(req.params.email)
+        User.findOneAndUpdate({ _id: req.params.userId }, { $set: params }, { new: true }).then(user => {
+          if (!user) { return res.status(404).send({ message: 'We did not find any User' }) }
+          const token = generateToken(user)
+          return res.json({ token }) /* istanbul ignore next */
+        }).catch(() => {
+          return res.status(500).send({ message: 'Internal serveur error' })
+        })
+      })
+    })
+
+  }
+
+  static deleteFriend (req, res) {
+    User.findOne({ _id: req.params.userId }).then(u => {
+
+      if (!u) { return res.status(404).send({ message: 'We did not find any User' }) }
+
+      User.findOne({ email: req.params.email }).then(is => {
+
+        if (!is) { return res.status(404).send({ message: 'We did not find any User' }) }
+        const index = u.friends.findIndex(e => e === req.params.email)
+        if (index === -1) { return res.status(404).send({ message: 'we did not find this friend' }) }
+        const params = { friends: u.friends || [] }
+        params.friends.splice(index, 1)
+        User.findOneAndUpdate({ _id: req.params.userId }, { $set: params }, { new: true }).then(user => {
+          if (!user) { return res.status(404).send({ message: 'We did not find any User' }) }
+          const token = generateToken(user)
+          return res.json({ token }) /* istanbul ignore next */
+        }).catch(() => {
+          return res.status(500).send({ message: 'Internal serveur error' })
+        })
+      })
+    })
   }
 
 }

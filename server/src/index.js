@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
 import event from './events/index.js'
 import config from '../config.js'
+import okok from '../test/createfake.js'
 
 const app = express()
 const server = require('http').createServer(app)
@@ -41,6 +42,7 @@ io.on('connection', (socket) => {
 
 db.once('open', () => {
   createRouter(app)
+  // okok()
   server.listen(config.local.port, () => {
     if (process.env.NODE_ENV === 'development') { console.log(`App is running and listening to port ${config.local.port}`) }
   })

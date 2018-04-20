@@ -3,6 +3,7 @@ import { fromJS } from 'immutable'
 import { login, verifeUser } from './user/index.js'
 import { updateListOfplayList, setListOfPlaylist, updatePlaylist } from './playlist/index.js'
 import { updateListOfRoom, setListOfRoom, updateRoom } from './room/index.js'
+import { getClassement } from './classement/index.js'
 
 const intialStateUser = {
   firstName: '',
@@ -31,6 +32,10 @@ const intialStateRoom = {
 
 const intialStateNotife = {
   message: '',
+}
+
+const initialClassement = {
+  songs: [],
 }
 
 export default class reducer {
@@ -75,6 +80,17 @@ export default class reducer {
       return updateRoom(state, action.data)
     case 'http/updateRoom':
       return updateRoom(state, action.data)
+    default:
+      return state
+    }
+  }
+
+  static classement (state = fromJS(initialClassement), action) {
+    switch (action.type) {
+    case 'http/getClassement':
+      return getClassement(state, action.data)
+    case 'http/updateClassement':
+      return getClassement(state, action.data)
     default:
       return state
     }

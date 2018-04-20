@@ -3,7 +3,7 @@ import { Actions } from 'react-native-router-flux'
 
 export function loginUser (event) {
   return dispatch => {
-    callApi(`user/${event.email}/`, 'get', {}, event.password).then(body => {
+    callApi(`user/${event.email.toLowerCase()}/`, 'get', {}, event.password).then(body => {
       return dispatch({
         type: 'http/login',
         data: body,
@@ -18,6 +18,7 @@ export function loginUser (event) {
 }
 
 export function singupUser (event) {
+  event.email = event.email.toLowerCase()
   return dispatch => {
     callApi('user/create', 'post', event).then(() => {
       return Actions.code({ email: event.email })
@@ -48,10 +49,8 @@ export function facebookLoginAction (event) {
 }
 
 export function facebookLinkAction (event, userId) {
-  console.log('ici')
   return dispatch => {
     callApi(`user/link/facebook/${userId}`, 'post', event.params).then(body => {
-      console.log(body)
       return dispatch({
         type: 'http/login',
         data: body,
@@ -127,6 +126,38 @@ export function resetPass (email) {
 export function verifyNewPassword (email, newPassword, code) {
   return dispatch => {
     callApi(`user/resetPassword/${email}/${code}/${newPassword}`, 'put').then(body => {
+      return dispatch({
+        type: 'http/login',
+        data: body,
+      })
+    }).catch(e => {
+      return dispatch({
+        type: 'client/addNotife',
+        data: e,
+      })
+    })
+  }
+}
+
+export function addFriend (email, userId) {
+  return dispatch => {
+    callApi(`user/addFriend/${email}/${userId}`, 'put').then(body => {
+      return dispatch({
+        type: 'http/login',
+        data: body,
+      })
+    }).catch(e => {
+      return dispatch({
+        type: 'client/addNotife',
+        data: e,
+      })
+    })
+  }
+}
+
+export function deleteFriend (email, userId) {
+  return dispatch => {
+    callApi(`user/deleteFriend/${email}/${userId}`, 'put').then(body => {
       return dispatch({
         type: 'http/login',
         data: body,

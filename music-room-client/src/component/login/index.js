@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Field, reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
-import { View, TextInput, Text, Button } from 'react-native-ui-lib'
+import { View, TextInput, Button } from 'react-native-ui-lib'
 import { Actions } from 'react-native-router-flux'
 import { loginUser } from '../../actions/user.js'
 import FacebookLogin from './facebookLogin.js'
@@ -11,14 +10,12 @@ import Toaster from '../toaster/index.js'
 
 class Login extends Component {
 
-  renderTextField = ({ input, label, meta: { touched, error }, ...custom, secureTextEntry }) => (
+  renderTextField = ({ input, label, ...custom, secureTextEntry }) => (
     <TextInput text50 placeholder={label} dark10 {...input} {...custom} secureTextEntry={secureTextEntry}/>
   )
 
   onSubmit = event => {
-
     this.props.dispatch(loginUser(event))
-    //  Actions.home()
   }
 
   render () {

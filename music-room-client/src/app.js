@@ -1,11 +1,7 @@
 import React, { Component } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
 import { Router, Scene, Stack } from 'react-native-router-flux'
-import { connect, Provider } from 'react-redux'
 // import BackgroundGeolocation from "react-native-background-geolocation";
 
-import { Toast } from 'react-native-ui-lib'
 import Home from './component/home/index'
 import NewPlaylist from './component/home/newplaylist.js'
 import Login from './component/login'
@@ -15,8 +11,11 @@ import EditPlaylist from './component/home/editplaylist.js'
 import ResetPass from './component/login/resetPass'
 import ImportList from './component/home/importPlaylist.js'
 import Room from './component/home/editroom'
+import Classement from './component/home/classement.js'
 import NewRoom from './component/home/newRoom'
-
+import MapRoom from './component/mapRoom'
+import Friend from './component/settings/friend'
+import ShowProfile from './component/settings/showProfile'
 class App extends Component {
   render () {
     return (
@@ -72,6 +71,26 @@ class App extends Component {
             component={Room}
             hideNavBar={false}
             title='Edit the room'
+          />
+          <Scene key='map'
+            component={MapRoom}
+            hideNavBar={false}
+            title='Map of rooms'
+          />
+          <Scene key='classement'
+            component={Classement}
+            hideNavBar={false}
+            title='Top music'
+          />
+          <Scene key='friend'
+            component={Friend}
+            hideNavBar={false}
+            title='Friends'
+          />
+          <Scene key='showProfile'
+            component={ShowProfile}
+            hideNavBar={false}
+            title='Your friend'
           />
         </Stack>
       </Router>

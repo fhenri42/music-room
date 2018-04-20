@@ -1,34 +1,40 @@
 import React, { Component } from 'react'
-import { View, TextInput, Text, Button } from 'react-native-ui-lib'
+import { View } from 'react-native-ui-lib'
 import { connect } from 'react-redux'
-import { WebView, Dimensions } from 'react-native'
-import { Actions } from 'react-native-router-flux'
 import Menu from './menu.js'
 import Playlist from './playlist.js'
 import { getPlayList } from '../../actions/playlist.js'
+import { createClassement } from '../../actions/classement.js'
 import { toJS } from 'immutable'
 import Settings from '../settings/index.js'
 import Toaster from '../toaster/index.js'
 import MusicTrack from './musicTrack.js'
 import { checkSession } from '../../utils/deezerService.js'
+import { Location, Permissions } from 'expo'
+import { getRoom } from '../../actions/room.js'
 
 class Home extends Component {
 
-  componentWillMount () {
-    Expo.SecureStore.getItemAsync('token', {}).then(token => {
-      return this.props.dispatch({
-        type: 'client/verifeUser',
-        data: token,
-      })
-    })
-
-  }
   state = {
     mode: this.props.mode || 0,
     disab: false,
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillMount () {
+    const { dispatch } = this.props
+    this.props.dispatch(createClassement(null))
+    Permissions.askAsync(Permissions.LOCATION).then(status => {
+      if (status.status !== 'granted') {
+        dispatch(getRoom({ userId: this.props.user.id }))
+      } else {
+        Location.getCurrentPositionAsync({}).then(position => {
+          dispatch(getRoom({ userId: this.props.user.id, lat: position.coords.latitude, long: position.coords.longitude }))
+        })
+
+      }
+    })
+  }
+  componentWillReceiveProps () {
     checkSession(((e) => {
       if (e === false) {
         this.setState({ mode: 2 })
@@ -37,12 +43,26 @@ class Home extends Component {
     }))
   }
 
-  serviceMode = () => { this.setState({ mode: 0 }) }
+  serviceMode = () => {
+    this.setState({ mode: 0 })
+    const { dispatch } = this.props
+    Permissions.askAsync(Permissions.LOCATION).then(status => {
+      if (status.status !== 'granted') {
+        dispatch(getRoom({ userId: this.props.user.id }))
+      } else {
+        Location.getCurrentPositionAsync({}).then(position => {
+          dispatch(getRoom({ userId: this.props.user.id, lat: position.coords.latitude, long: position.coords.longitude }))
+        })
+
+      }
+    })
+  }
+
   playListMode = () => { this.setState({ mode: 1 }); this.props.dispatch(getPlayList(this.props.user.id)) }
   settingsMode= () => { this.setState({ mode: 2 }) }
   render () {
 
-    const { handleSubmit, user, playlist } = this.props
+    const { user, playlist } = this.props
     const { mode, disab } = this.state
     return (
 

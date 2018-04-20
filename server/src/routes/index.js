@@ -2,11 +2,13 @@ import express from 'express'
 import userRoutes from './user.routes'
 import playlistRoute from './playlist.routes'
 import roomRoute from './room.routes'
+import classementRoute from './classement.routes'
 
 export const routes = [
   ...userRoutes,
   ...playlistRoute,
   ...roomRoute,
+  ...classementRoute,
 ]
 
 export const createRouter = app => {

@@ -16,6 +16,7 @@ export function login (state, data) {
     .setIn(['id'], fromJS(user.id))
     .setIn(['musicTags'], fromJS(user.musicTags))
     .setIn(['isFaceBookLogin'], fromJS(user.isFaceBookLogin))
+    .setIn(['friends'], fromJS(user.friends || []))
 }
 
 export function verifeUser (state, token) {
@@ -32,4 +33,5 @@ export function verifeUser (state, token) {
     .setIn(['isActive'], fromJS(user.isActive))
     .setIn(['isFaceBookLogin'], fromJS(user.isFaceBookLogin))
     .setIn(['musicTags'], fromJS(user.musicTags || []))
+    .setIn(['friends'], fromJS(user.friends || []))
 }

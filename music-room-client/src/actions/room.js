@@ -1,6 +1,5 @@
 import { callApi } from '../utils/callApi.js'
 import { Actions } from 'react-native-router-flux'
-import { getRoomTracks } from '../utils/deezerService.js'
 
 export function getRoom (user) {
   return dispatch => {

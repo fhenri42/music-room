@@ -1,22 +1,7 @@
-import { toJs } from 'immutable'
+import { toJS } from 'immutable'
 import { Actions } from 'react-native-router-flux'
 import jwtDecode from 'jwt-decode'
-import { checkSession, connectDeezer } from '../utils/deezerService.js'
 
-function connection (data) {
-
-  return {
-    type: 'socket/connection',
-    data,
-  }
-}
-
-function forceLogOut () {
-  return {
-    type: 'client/logOut',
-    data: {},
-  }
-}
 function verifeUser (token) {
   return {
     type: 'client/verifeUser',
@@ -24,14 +9,13 @@ function verifeUser (token) {
   }
 }
 
-const simpleMiddleWare = socket => ({ dispatch, getState }) => {
+const simpleMiddleWare = () => ({ dispatch }) => {
 
   return next => action => {
 
     return Expo.SecureStore.getItemAsync('token', {}).then(token => {
       if (token && (Actions.currentScene === 'login' || Actions.currentScene === 'singup')) {
 
-        const userState = getState().user.toJS()
         const tmpToken = jwtDecode(token)
         if (tmpToken.isActive) {
           Actions.home()

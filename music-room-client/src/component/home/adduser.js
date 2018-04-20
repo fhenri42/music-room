@@ -1,17 +1,15 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, TouchableOpacity, View, Text } from 'react-native'
+import { View, Text } from 'react-native'
 import { Field, reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import { Card, Input, H4, Switcher, TabButton, Button, RadioGroup } from 'nachos-ui'
-
+import { Input, Button, RadioGroup } from 'nachos-ui'
 import { updatePlaylistPrivate, deleteAUser } from '../../actions/playlist.js'
 import { Icon } from 'react-native-elements'
-import Toaster from '../toaster/index.js'
 
 class AddNewUser extends Component {
 
-  renderTextField = ({ input, label, meta: { touched, error }, ...custom, secureTextEntry }) => (
+  renderTextField = ({ input, label, ...custom }) => (
 
     <Input
       style={{ margin: 15 }}
@@ -20,7 +18,7 @@ class AddNewUser extends Component {
       {...custom}
     />
   )
-  renderRadioGroup = ({ input, label, meta: { touched, error }, ...custom }) => (
+  renderRadioGroup = ({ input }) => (
     <RadioGroup
       style={{ margin: 15 }}
       onChange= {(a, b) => { input.onChange(a, b) }}
@@ -35,7 +33,7 @@ class AddNewUser extends Component {
 
   render () {
 
-    const { handleSubmit, users, user } = this.props
+    const { handleSubmit, users } = this.props
 
     return (
       <View>
@@ -93,7 +91,6 @@ AddNewUser = reduxForm({
 
 const mapStateToProps = state => {
   return {
-    user: state.user.toJS(),
     playlist: state.playlist.toJS(),
     notife: state.notife.toJS(),
   }
